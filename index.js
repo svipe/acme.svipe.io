@@ -149,8 +149,8 @@ function verifyRP(redirect_uri) {
         return nil;
     }
     var configURL = url.parse(redirect_uri).hostname + ".well-known/svipe-configuration.json";
-    const response = await fetch(configURL);
-    const json = await response.json();
+    const response = fetch(configURL);
+    const json = response.json();
     if (json != nil) {
         return {logo: json.registration, domain: hostname};
     } else {
