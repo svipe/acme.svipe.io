@@ -71,7 +71,9 @@ app.get('/', (req, res) => {
         generateQRCode(sessionID,redirect_uri, claims).then(function(srcpic) {
             res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: json.client_id, srcpic: srcpic});
         });
-    })
+    }).catch(error => {
+        console.error('Error during service worker registration:', error);
+      });
 
     /*
     console.log("All sessions");
