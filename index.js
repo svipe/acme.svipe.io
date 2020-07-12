@@ -141,6 +141,11 @@ app.post('/progress', (req, res) => {
     }
 });
 
+async function retrieveConf(configURL){
+    return await fetch(configURL)
+    .then(res => res.json())
+}
+
 
 function verifyRP(redirect_uri) {
     console.log("verifyRP",redirect_uri);
@@ -150,16 +155,15 @@ function verifyRP(redirect_uri) {
     }
     var configURL = "https://" + url.parse(redirect_uri).hostname + "/.well-known/svipe-configuration.json";
     console.log(configURL);
-    //(async () => {
-        const response = fetch(configURL);
-        const json = response.json();
-        console.log(json);
-        if (json) {
-            return {logo: json.registration, domain: hostname};
-        } else {
-            return null;
-        }
-    //})();
+
+    const json = await retrieveConf(configURL) ;
+    
+    if (json) {
+        return {logo: json.registration, domain: hostname};
+    } else {
+        return null;
+    }
+    
     
 }
 
