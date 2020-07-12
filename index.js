@@ -65,7 +65,7 @@ app.get('/', (req, res) => {
  
     var rp = verifyRP(redirect_uri);
 
-    if (rp != nil) {
+    if (rp) {
         generateQRCode(sessionID,redirect_uri, claims).then(function(srcpic) {
             res.render('main', {layout: 'index', logo: rp.logo,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: rp.domain, srcpic: srcpic});
         });
@@ -145,16 +145,16 @@ app.post('/progress', (req, res) => {
 function verifyRP(redirect_uri) {
     console.log("verifyRP",redirect_uri);
     var hostname = url.parse(redirect_uri).hostname;
-    if (hostname == nil) {
-        return nil;
+    if (!hostname) {
+        return null;
     }
     var configURL = url.parse(redirect_uri).hostname + ".well-known/svipe-configuration.json";
     const response = fetch(configURL);
     const json = response.json();
-    if (json != nil) {
+    if (json) {
         return {logo: json.registration, domain: hostname};
     } else {
-        return nil;
+        return null;
     }
 }
 
