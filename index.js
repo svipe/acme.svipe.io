@@ -148,8 +148,8 @@ function verifyRP(redirect_uri) {
     if (!hostname) {
         return null;
     }
-    var configURL = url.parse(redirect_uri).hostname + ".well-known/svipe-configuration.json";
-
+    var configURL = "https://" + url.parse(redirect_uri).hostname + "/.well-known/svipe-configuration.json";
+    console.log(configURL);
     (async () => {
         const response = await fetch(configURL);
         const json = await response.json();
