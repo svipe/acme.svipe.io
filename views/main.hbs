@@ -90,10 +90,11 @@ function setupSocket() {
             showProgress();
         } else if (msg.op == "authdone") {
             var jwt = msg.jwt;
+            var sub = msg.sub;
             if (jwt != null) {
                 console.log("received jwt token", jwt);
                 socket.close();
-                window.location.href = redirect_uri + "?jwt=" + jwt;
+                window.location.href = redirect_uri + "?jwt=" + jwt + "&sub=" + sub;
                 // Now redirect 
             } else {
                 console.error("No jwt token received");

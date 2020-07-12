@@ -12,6 +12,9 @@ const io = require('socket.io')(server);
 //const uuidv1 = require('uuid/v1');
 const cors = require('cors');
 var clients = {}; // Keep track of outstanding connections
+const base64url = require('base64url');
+const jws = require('jws-jwk');
+
 
 let memoryStore = new session.MemoryStore();
 
@@ -78,10 +81,24 @@ app.post('/', (req, res) => {
     var socket = clients[uuid];
     if (socket != undefined || socket != null ) {
       console.log("Has client for ", uuid);
-      var msg = {op:'authdone', jwt: req.body.jwt};
-      socket.emit("message", msg);
-      delete clients[uuid];
-      res.end(statusOK);
+      // now we need to verify stuff before forwarding...
+      var token = req.body.jwt;
+      var parts = token.split('.');
+      
+      var header = JSON.parse(base64url.decode(parts[0]));
+      var payload = JSON.parse(base64url.decode(parts[1]));
+      var signature = JSON.parse(base64url.decode(parts[2]));
+      var sub_jwk = payload.sub_jwk;
+      var sub = payload.sub;
+      if (verifyPayload(header, payload) && jws.verify(signature,sub_jwk)) {
+        var msg = {op:'authdone', jwt: token, sub: sub};
+        socket.emit("message", msg);
+        delete clients[uuid];
+        res.end(statusOK);
+      } else {
+        res.end(statusNOK);
+      }
+      
     } else {
       res.end(statusNOK);
     }
@@ -103,9 +120,56 @@ app.post('/progress', (req, res) => {
     }
 });
 
+
 function verifyRP(redirect_uri) {
     console.log("verifyRP",redirect_uri);
     return true;
+}
+
+function verifyPayload(header, payload) {
+
+    // First the basics
+
+    if (payload.sub_jwk === undefined) {
+        console.err("sub_jwk missing");
+        return false;
+    }
+
+    if (payload.iat === undefined) {
+        console.err("iat missing");
+        return false;
+    }
+
+    if (payload.exp === undefined) {
+        console.err("exp missing");
+        return false;
+    }
+
+    if (payload.aud === undefined) {
+        console.err("aud missing");
+        return false;
+    } else if (Array.isArray(payload.aud)) {
+        if (!payload.aud.includes(SvipeIDConfig.client_id)) {
+            console.error("client_id not in aud array");
+            return false;
+        }
+    } else if (payload.aud === SvipeIDConfig.client_id) {
+        console.error("aud is not equal to client_id");
+        return false;
+    }
+
+    if ( header.kid !== payload.sub) {
+        console.error("sub must be equal to kid");
+        return false;
+    }
+
+    if (header.alg === undefined || header.alg === 'none' ) {
+        console.error("no alg");
+        return false;
+    }
+    console.log("payload verified");
+    return true;
+
 }
 
 function generateQRCode(sessionID,redirect_uri, claims) {
