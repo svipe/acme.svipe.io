@@ -10,6 +10,11 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "express-handlebars": ">=4.3.0"
+    "express-handlebars": ">=4.3.0",
+    "express-jwt": "^6.0.0",
+    "express-session": "^1.17.1",
+    "jose-jwe-jws": "^0.2.2",
+    "node-webcrypto-ossl": "^2.1.0",
+    "qrcode": "^1.4.4"
   }
 }

@@ -1,9 +1,48 @@
-{{> lovedChamps}}
-{{> hatedChamps}}
-<ul>
-  {{#if listExists}}
-    {{#each suggestedChamps}}
-      <li class={{this.lane}}>{{this.name}}</li>
-    {{/each}}
-  {{/if}}
-</ul>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Svipe iD Demo Example</title>
+<link rel="icon" href="https://demo.svipe.com/demo-icon.png" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<style>
+    html, body { height: 100%;}
+    .container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+</style>
+</head>
+
+<body>
+    <!-- The modal -->
+    <div >
+        <div class="modal-header">
+            <h4 class="modal-title"><img width=25 height=25 src=https://is1-ssl.mzstatic.com/image/thumb/Purple113/v4/b5/83/4e/b5834e32-3b00-51c5-d875-4309e40780a4/pr_source.png/150x150bb-80.png></img> Svipe iD</h4>
+        </div>
+        <div class="modal-body text-center">
+            <div class="profile__logo" id="" aria-hidden="true" >
+                <p>
+                    <img id="profile__logo__app-image" height=72 width=72 src="https://appleid.cdn-apple.com/appleauth/static/bin/cb3422455260/images/appicon.png"></img>
+                </p>
+            </div>
+            <div id="signup">
+                <p>To sign in to {{{domain}}} using your Svipe iD, please scan this code</p>
+                <div id="qrcode"><img src={{{srcpic}}} width="50%"></div>
+            </div>
+            <!--div id="progress">
+                <p>Waiting for approval of the disclosure request</p>
+            </div -->
+            <div>
+              <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
+            </div>
+        </div>
+</body>
+
+</html>
