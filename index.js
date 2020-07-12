@@ -149,13 +149,18 @@ function verifyRP(redirect_uri) {
         return null;
     }
     var configURL = url.parse(redirect_uri).hostname + ".well-known/svipe-configuration.json";
-    const response = fetch(configURL);
-    const json = response.json();
-    if (json) {
-        return {logo: json.registration, domain: hostname};
-    } else {
-        return null;
-    }
+
+    (async () => {
+        const response = await fetch(configURL);
+        const json = await response.json();
+        console.log(json);
+        if (json) {
+            return {logo: json.registration, domain: hostname};
+        } else {
+            return null;
+        }
+    })();
+    
 }
 
 function verifyPayload(header, payload) {
