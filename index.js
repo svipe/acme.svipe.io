@@ -100,7 +100,7 @@ app.post('/', (req, res) => {
       console.log("sub", sub);
 
       console.log("verify payload",verifyPayload(header, payload));
-      console.log("verify signature", jws.verify(signature,sub_jwk));
+      //console.log("verify signature", jws.verify(signature,sub_jwk));
       // EC keys not supported....
 
       var isVerified = true;
