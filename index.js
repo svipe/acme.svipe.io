@@ -5,6 +5,15 @@ const handlebars = require('express-handlebars');
 const session = require('express-session');
 var jwt = require('express-jwt');
 const QRCode = require('qrcode');
+const { Store } = require('express-session');
+const bodyParser = require('body-parser');
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+//const uuidv1 = require('uuid/v1');
+const cors = require('cors');
+var clients = {}; // Keep track of outstanding connections
+
+let memoryStore = new session.MemoryStore();
 
 app.set('view engine', 'hbs');
 app.set('trust proxy', 1); // trust first proxy
@@ -17,33 +26,81 @@ app.engine('hbs', handlebars({
 }));
 
 app.use(express.static('public'));
+app.use(cors());
 
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
+    store: memoryStore,
     saveUninitialized: true,
     cookie: { secure: true }
   }));
 
-app.get('/', (req, res) => {
-    var session = req.session;
-    console.log("session", session);
-    var sessionID = req.sessionID;
-    console.log("sessionID", req.sessionID);
- 
-    var referrer = req.get('Referrer');
-    console.log("Referrer", referrer);
-    var redirect_uri = req.query["redirect_uri"];
-    console.log("redirect_uri",redirect_uri);
-    var claims = req.query["claims"];
-    console.log("claims", claims);
+app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(bodyParser.json());
+
+app.get('/', (req, res) => {
+
+    console.log("memoryStore", memoryStore);
+
+    var session = req.session;
+    var sessionID = req.sessionID;
+    var referrer = req.get('Referrer');
+    var redirect_uri = req.query["redirect_uri"];
+    var claims = req.query["claims"];
+    session.redirect_uri = redirect_uri;
+    console.log("session", session);
+    console.log("sessionID", sessionID);
+    console.log("session.store", session.store);
+ 
     if (verifyRP(redirect_uri)) {
         generateQRCode(sessionID,redirect_uri, claims).then(function(srcpic) {
-            res.render('main', {layout: 'index', referrer: referrer, domain: "example.com", srcpic: srcpic});
+            res.render('main', {layout: 'index', redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: "example.com", srcpic: srcpic});
         });
     }
-    //res.redirect(ref);
+
+    /*
+    console.log("All sessions");
+    memoryStore.all(function (error,sessions) {
+        console.log("sessions", sessions);
+    })*/
+
+});
+
+app.post('/', (req, res) => {
+
+    var uuid = req.body.uuid;
+
+    var statusOK = JSON.stringify({status:'OK'});
+    var statusNOK = JSON.stringify({status:'NOK'});
+  
+    var socket = clients[uuid];
+    if (socket != undefined || socket != null ) {
+      console.log("Has client for ", uuid);
+      var msg = {op:'authdone', jwt: req.body.jwt};
+      socket.emit("message", msg);
+      delete clients[uuid];
+      res.end(statusOK);
+    } else {
+      res.end(statusNOK);
+    }
+
+});
+
+app.post('/progress', (req, res) => {
+    var uuid = req.body.uuid;
+    var statusOK = JSON.stringify({status:'OK'});
+    var statusNOK = JSON.stringify({status:'NOK'});
+    var socket = clients[uuid];
+    if (socket != undefined || socket != null ) {
+      console.log("Has client for ", uuid);
+      var msg = {op:'progress', jwt: "scanned"};
+      socket.emit("message", msg);
+      res.end(statusOK);
+    } else {
+      res.end(statusNOK);
+    }
 });
 
 function verifyRP(redirect_uri) {
@@ -86,13 +143,31 @@ function composeQuery(sessionID,redirect_uri, claims) {
     // var url = "openid://?response_type=id_token&client_id="+client_id+"&scope=openid%20profile&state="+state+"&nonce="+nonce+"&registration="+registration+"&claims="+claims;
     // To keep the QR code eligible we need to minimize the length. Maybe make most of the clientid default as well using well-known example.com
   
+    //var socket_uri = "https://auth.svipe.io";
+
     queryString = "?client_id="+redirect_uri+"&nonce="+nonce+"&claims="+claims;
     console.log("claims", claims);
     console.log("queryString", queryString);
-  
     return "openid:" + queryString;
 
  }
-  
 
-app.listen(port, () => console.log(`App listening to port ${port}`));
+io.on('connection', socket => {
+    socket.on('message', msg => {
+
+      console.log("received ",msg);
+
+      if (msg.op == "hello" && msg.uuid) {
+        var uuid = msg.uuid;
+        clients[uuid] = socket;
+        var msg = {op:'hello'};
+        console.log("emit ",msg)
+        io.emit('message', msg);
+      } else {
+          console.error("socket handshake failed");
+      }
+
+    });  
+});
+
+server.listen(port, () => console.log(`App listening to port ${port}`));

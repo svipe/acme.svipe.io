@@ -6,6 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Svipe iD Demo Example</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 <link rel="icon" href="https://demo.svipe.com/demo-icon.png" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
@@ -46,3 +48,53 @@
 </body>
 
 </html>
+
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+  var redirect_uri = "{{{redirect_uri}}}";
+  setupSocket();
+});
+
+function setupSocket() {
+
+    console.log("setupSocket");
+
+    const socket = io('https://auth.svipe.io');
+    //const socket = io('http://localhost:4000');
+
+    if (socket == null ) {
+        console.log("Socket could not be opened");
+        return;
+    }
+
+    var helloMsg = {op: 'hello', uuid: '{{{sessionID}}}' };
+
+    console.log("emit ", helloMsg);
+    socket.emit("message", helloMsg);
+
+    socket.on("message", function(msg) {
+        console.log("received ",msg);
+        if (msg.op == "hello") {
+            console.log("socket established");
+        } else if (msg.op == "progress") {
+            console.log("progress");
+            //showProgress();
+        } else if (msg.op == "authdone") {
+            var jwt = msg.jwt;
+            if (jwt != null) {
+                console.log("received jwt token", jwt);
+                socket.close();
+                window.location.href = redirect_uri + "?jwt=" + jwt;
+                // Now redirect 
+            } else {
+                console.error("No jwt token received");
+            }
+        } else {
+            console.error("Could not contact socket server")
+        }
+    });   
+}
+
+</script>
