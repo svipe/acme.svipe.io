@@ -95,16 +95,24 @@ app.post('/', (req, res) => {
 
       var sub_jwk = payload.sub_jwk;
       var sub = payload.sub;
+
+      console.log("sub_jwk", sub_jwk);
+      console.log("sub", sub);
+
       console.log("verify payload",verifyPayload(header, payload));
       console.log("verify signature", jws.verify(signature,sub_jwk));
+      // EC keys not supported....
 
-      if (true) /*(verifyPayload(header, payload) && jws.verify(signature,sub_jwk)) */ {
+      var isVerified = true;
+
+      if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
+        console.log(msg);
         socket.emit("message", msg);
         delete clients[uuid];
         res.end(statusOK);
       } else {
-          console.error("could not verify token");
+        console.error("could not verify token");
         res.end(statusNOK);
       }
       
