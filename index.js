@@ -63,13 +63,15 @@ app.get('/', (req, res) => {
     console.log("sessionID", sessionID);
     console.log("session.store", session.store);
  
-    var rp = verifyRP(redirect_uri);
+    var hostname = url.parse(redirect_uri).hostname;
+    var configURL = "https://" + url.parse(redirect_uri).hostname + "/.well-known/svipe-configuration.json";
+    console.log(configURL);
 
-    if (rp) {
+    retrieveConf(configURL).then( function(json) {
         generateQRCode(sessionID,redirect_uri, claims).then(function(srcpic) {
-            res.render('main', {layout: 'index', logo: rp.logo,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: rp.domain, srcpic: srcpic});
+            res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: json.client_id, srcpic: srcpic});
         });
-    }
+    })
 
     /*
     console.log("All sessions");
@@ -148,22 +150,17 @@ async function retrieveConf(configURL){
 
 
 function verifyRP(redirect_uri) {
+
     console.log("verifyRP",redirect_uri);
     var hostname = url.parse(redirect_uri).hostname;
     if (!hostname) {
         return null;
     }
+
     var configURL = "https://" + url.parse(redirect_uri).hostname + "/.well-known/svipe-configuration.json";
     console.log(configURL);
 
-    const json = await retrieveConf(configURL) ;
-    
-    if (json) {
-        return {logo: json.registration, domain: hostname};
-    } else {
-        return null;
-    }
-    
+    return retrieveConf(configURL) ;
     
 }
 
