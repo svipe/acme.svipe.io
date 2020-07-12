@@ -150,16 +150,16 @@ function verifyRP(redirect_uri) {
     }
     var configURL = "https://" + url.parse(redirect_uri).hostname + "/.well-known/svipe-configuration.json";
     console.log(configURL);
-    (async () => {
-        const response = await fetch(configURL);
-        const json = await response.json();
+    //(async () => {
+        const response = fetch(configURL);
+        const json = response.json();
         console.log(json);
         if (json) {
             return {logo: json.registration, domain: hostname};
         } else {
             return null;
         }
-    })();
+    //})();
     
 }
 
