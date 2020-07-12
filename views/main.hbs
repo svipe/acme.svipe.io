@@ -38,9 +38,9 @@
                 <p>To sign in to {{{domain}}} using your Svipe iD, please scan this code</p>
                 <div id="qrcode"><img src={{{srcpic}}} width="50%"></div>
             </div>
-            <!--div id="progress">
+            <div id="progress">
                 <p>Waiting for approval of the disclosure request</p>
-            </div -->
+            </div>
             <div>
               <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
             </div>
@@ -55,7 +55,14 @@ var redirect_uri = "{{{redirect_uri}}}";
 
 $(document).ready(function() {
   setupSocket();
+  $("#progress").hide();
 });
+
+
+function showProgress() {
+    $("#signup").hide();
+    $("#progress").show();
+}
 
 function setupSocket() {
 
@@ -80,7 +87,7 @@ function setupSocket() {
             console.log("socket established");
         } else if (msg.op == "progress") {
             console.log("progress");
-            //showProgress();
+            showProgress();
         } else if (msg.op == "authdone") {
             var jwt = msg.jwt;
             if (jwt != null) {
