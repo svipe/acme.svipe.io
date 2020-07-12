@@ -39,7 +39,11 @@
                 <div id="qrcode"><img src={{{srcpic}}} width="50%"></div>
             </div>
             <div id="progress">
-                <p>Waiting for approval of the disclosure request</p>
+                <p>
+                <div class="spinner-border" role="status">
+                <span class="sr-only">Waiting for approval of the disclosure request.</span>
+                </div>
+                </p>
             </div>
             <div>
               <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
