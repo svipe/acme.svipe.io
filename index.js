@@ -15,6 +15,10 @@ var clients = {}; // Keep track of outstanding connections
 const base64url = require('base64url');
 const jws = require('jws-jwk');
 
+var SvipeIDConfig = {
+	client_id: null,
+	registration: null 
+}
 
 let memoryStore = new session.MemoryStore();
 
@@ -150,10 +154,11 @@ function verifyPayload(header, payload) {
         return false;
     }
 
+
     if (payload.aud === undefined) {
         console.err("aud missing");
         return false;
-    } else if (Array.isArray(payload.aud)) {
+    } /*else if (Array.isArray(payload.aud)) {
         if (!payload.aud.includes(SvipeIDConfig.client_id)) {
             console.error("client_id not in aud array");
             return false;
@@ -161,7 +166,8 @@ function verifyPayload(header, payload) {
     } else if (payload.aud === SvipeIDConfig.client_id) {
         console.error("aud is not equal to client_id");
         return false;
-    }
+    }*/
+
 
     if ( header.kid !== payload.sub) {
         console.error("sub must be equal to kid");
