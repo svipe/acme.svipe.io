@@ -14,6 +14,8 @@ const cors = require('cors');
 var clients = {}; // Keep track of outstanding connections
 const base64url = require('base64url');
 const jws = require('jws-jwk');
+const fetch = require('node-fetch');
+var url = require('url');
 
 var SvipeIDConfig = {
 	client_id: null,
@@ -61,9 +63,11 @@ app.get('/', (req, res) => {
     console.log("sessionID", sessionID);
     console.log("session.store", session.store);
  
-    if (verifyRP(redirect_uri)) {
+    var rp = verifyRP(redirect_uri);
+
+    if (rp != nil) {
         generateQRCode(sessionID,redirect_uri, claims).then(function(srcpic) {
-            res.render('main', {layout: 'index', redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: "example.com", srcpic: srcpic});
+            res.render('main', {layout: 'index', logo: rp.logo,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: rp.domain, srcpic: srcpic});
         });
     }
 
@@ -140,7 +144,18 @@ app.post('/progress', (req, res) => {
 
 function verifyRP(redirect_uri) {
     console.log("verifyRP",redirect_uri);
-    return true;
+    var hostname = url.parse(redirect_uri).hostname;
+    if (hostname == nil) {
+        return nil;
+    }
+    var configURL = url.parse(redirect_uri).hostname + ".well-known/svipe-configuration.json";
+    const response = await fetch(configURL);
+    const json = await response.json();
+    if (json != nil) {
+        return {logo: json.registration, domain: hostname};
+    } else {
+        return nil;
+    }
 }
 
 function verifyPayload(header, payload) {

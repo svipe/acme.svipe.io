@@ -18,9 +18,11 @@
     "jose-jwe-jws": "^0.2.2",
     "jws": "^4.0.0",
     "jws-jwk": "^0.1.4",
+    "node-fetch": "^2.6.0",
     "node-webcrypto-ossl": "^2.1.0",
     "qrcode": "^1.4.4",
     "socket.io": "^2.3.0",
+    "url": "^0.11.0",
     "uuid": "^8.2.0"
   }
 }
