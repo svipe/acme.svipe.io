@@ -148,7 +148,7 @@ function composeQuery(sessionID,redirect_uri, claims) {
     queryString = "?client_id="+redirect_uri+"&nonce="+nonce+"&claims="+claims;
     console.log("claims", claims);
     console.log("queryString", queryString);
-    return "openid:" + queryString;
+    return "openid://" + queryString;
 
  }
 
