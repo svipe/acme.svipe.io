@@ -87,7 +87,8 @@ app.post('/', (req, res) => {
       
       var header = JSON.parse(base64url.decode(parts[0]));
       var payload = JSON.parse(base64url.decode(parts[1]));
-      var signature = JSON.parse(base64url.decode(parts[2]));
+      var signature = base64url.decode(parts[2]);
+
       var sub_jwk = payload.sub_jwk;
       var sub = payload.sub;
       console.log("verify payload",verifyPayload(header, payload));
