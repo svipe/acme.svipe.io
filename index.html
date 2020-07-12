@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Svipe iD Demo Example</title>
+<link rel="icon" href="https://demo.svipe.com/demo-icon.png" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="jose.js"></script>
+
+<script type="text/javascript">
+
+/* 
+
+  TODO
+
+- Timeout
+- Error msg
+- Progress messages
+- Token validation
+
+*/
+
+// Default config
+
+var SvipeIDConfig = {
+	client_id: window.location.hostname + "/callback",
+	registration: null // Maybe /.well-known/logo.png ?
+}
+
+</script>
+
+<style>
+    html, body { height: 100%;}
+    .container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+</style>
+</head>
+
+<body>
+    
+    <div class=container>
+        <div class="h-100 row align-items-center">
+            <div class="col align-items-center">
+                <button id=svipe type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal"  claims='{"given_name": {"essential":true}, "email": {"essential":true}, "portrait":null}'>Sign in with Svipe iD (request given_name, email, portrait)</button><br>
+                <div id=result><center><h3><div id=json></div></h3></div></center></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The modal -->
+
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><img width=25 height=25 src=https://is1-ssl.mzstatic.com/image/thumb/Purple113/v4/b5/83/4e/b5834e32-3b00-51c5-d875-4309e40780a4/pr_source.png/150x150bb-80.png></img> Svipe iD</h4>
+            </div>
+            <div class="modal-body text-center">
+                <div class="profile__logo" id="" aria-hidden="true" >
+                    <p>
+                        <img id="profile__logo__app-image" height=72 width=72 src="https://appleid.cdn-apple.com/appleauth/static/bin/cb3422455260/images/appicon.png"></img>
+                    </p>
+                </div>
+
+                <div class="login">
+                    <p>Do you want to sign in to demo.svipe.io using your Svipe iD, Johan Sellström. </p>
+                    <p>
+                        <a href=# onClick="signupMode(true);">Use a different Svipe iD</a>
+                    </p>
+                </div>
+
+                <div id="signup">
+                    <p>To sign in to demo.svipe.io using your Svipe iD, please scan this code</p>
+                    <div id="qrcode"></div>
+                    <p> or if you are on the device where Svipe is installed, you can 
+                    <p><button type="button" class="btn btn-default text-center" data-dismiss="modal" onClick="continueOnDevice();">Continue</button></p>
+                    </p>
+                </div>
+
+                <div id="progress">
+                    <p>Waiting for approval of the disclosure request</p>
+                </div>
+
+                <!-- div class="clearfix">
+                    <label class="pull-left checkbox-inline"><input type="checkbox"> Remember me</label>
+                </div-->
+
+                <div class="modal-footer login">
+                    <button type="button" class="btn btn-default text-center" data-dismiss="modal">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+<!-- This should go into an included script -->
+
+<script type="text/javascript">
+
+var signup = true;
+var claims = {};
+var queryString = "";
+
+$(document).ready(function() {
+
+	init();
+
+	$('#myModal').on('shown.bs.modal', function (e) {
+		$("#qrcode").html("");
+  	    signupMode(signup);
+	})
+
+	$('#myModal').on('hidden.bs.modal', function (e) {
+		$("#qrcode").html("");
+  	//signupMode(signup);
+	})
+
+});
+
+function config() {
+    console.log(typeof SvipeIDConfig); // reports object
+    var hostname = window.location.hostname;
+    console.log("hostname ", hostname);
+    
+    if (typeof SvipeIDConfig === undefined) {
+        console.log("No config");
+    }
+
+    var xmlhttp = new XMLHttpRequest();
+    var configuration = "/.well-known/svipe-configuration";
+
+    console.log("request configuration file",configuration);
+
+    xmlhttp.open("GET", configuration, false);
+    xmlhttp.send();
+
+    if (xmlhttp.status === 200) {
+        SvipeIDConfig = JSON.parse(xmlhttp.responseText);
+        console.log("Using .well-known config");
+    }
+
+    var c = $("#svipe").attr("claims");
+    claims = encodeURIComponent(c);
+   
+}
+
+function hasCookies() {
+    var svipeID = $.cookie("svipeID");
+	var svipeName = $.cookie("svipeName");
+	var remembered = !(svipeID == null);
+     // For now we do not support remember me
+	return remembered;
+}
+
+function init() {
+    $("#result").hide();
+    $("#progress").hide();
+    config();
+    signup = !hasCookies();
+}
+
+function showProgress() {
+    $("#signup").hide();
+    $("#progress").show();
+}
+
+function continueOnDevice() {
+    var url = "https://login.svipe.io/" + queryString + "&ondevice=1"; // Signal that the callback should happen differently
+    window.location.href = url;
+}
+
+/*
+
+"claims":
+    {
+     "userinfo":
+      {
+       "given_name": {"essential": true},
+       "email_verified": {"essential": true},
+       "picture": null
+      },
+     "id_token":
+      {
+       "gender": null,
+       "birthdate": {"essential": true},
+       "acr": {"values": ["urn:mace:incommon:iap:silver"]}
+      }
+    }
+
+*/
+
+function formatClaims() {
+
+}
+
+function composeQuery(token) {
+
+    var req= "";
+	var nonce = token;
+    var state = token;
+    var registration = "";
+
+	var client_id = encodeURIComponent(SvipeIDConfig.client_id);
+
+	if (SvipeIDConfig.registration != null ) {
+	    $("#profile__logo__app-image").attr("src",SvipeIDConfig.registration);
+	    var registration = encodeURIComponent(SvipeIDConfig.registration);
+    }
+	
+    // make token
+
+    var jwt = {response_type: "id_token", client_id: client_id, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    console.log("jwt",jwt);
+
+    var jwt_string = JSON.stringify(jwt);
+    var base64UrlEncoder = new Jose.Utils.Base64Url();
+    var jwt_token = base64UrlEncoder.encode(jwt_string);
+
+    console.log("jwt_token",jwt_token);
+
+    // var url = "openid://"+jwt_token;
+	// var url = "openid://?response_type=id_token&client_id="+client_id+"&scope=openid%20profile&state="+state+"&nonce="+nonce+"&registration="+registration+"&claims="+claims;
+    // To keep the QR code eligible we need to minimize the length. Maybe make most of the clientid default as well using well-known example.com
+
+    queryString = "?client_id="+client_id+"&nonce="+nonce+"&claims="+claims;
+    console.log("claims", claims);
+    console.log("queryString", queryString);
+
+}
+
+function generateQRCode(token) {
+    composeQuery(token);
+    var url = "openid://"+queryString;
+    console.log("url ", url);
+    $("#qrcode").empty();
+	$("#qrcode").qrcode({
+	"width": 200,
+	"height": 200,
+    "text": url});
+
+}
+
+function signupMode(isSignup) {
+
+	if (isSignup) {
+		$(".login").hide();
+		$("#signup").show();
+		setupSocket();
+	} else {
+		$(".login").show();
+		$("#signup").hide();
+	}
+}
+
+function verifyPayload(header, payload) {
+
+    // First the basics
+
+    if (payload.sub_jwk === undefined) {
+        console.err("sub_jwk missing");
+        return false;
+    }
+
+    if (payload.iat === undefined) {
+        console.err("iat missing");
+        return false;
+    }
+
+    if (payload.exp === undefined) {
+        console.err("exp missing");
+        return false;
+    }
+
+    if (payload.aud === undefined) {
+        console.err("aud missing");
+        return false;
+    } else if (Array.isArray(payload.aud)) {
+        if (!payload.aud.includes(SvipeIDConfig.client_id)) {
+            console.error("client_id not in aud array");
+            return false;
+        }
+    } else if (payload.aud === SvipeIDConfig.client_id) {
+        console.error("aud is not equal to client_id");
+        return false;
+    }
+
+    if ( header.kid !== payload.sub) {
+        console.error("sub must be equal to kid");
+        return false;
+    }
+
+    if (header.alg === undefined || header.alg === 'none' ) {
+        console.error("no alg");
+        return false;
+    }
+    console.log("payload verified");
+    return true;
+
+}
+
+function verifySignature(token, header, payload) {
+    
+    var cryptographer2 = new Jose.WebCryptographer();
+    cryptographer2.setContentSignAlgorithm(header.alg);
+
+    var verifier = new Jose.JoseJWS.Verifier(cryptographer2, token);
+    return verifier.addRecipient(payload.sub_jwk,header.kid).then(function () {
+        return verifier.verify()
+    });
+    
+}
+
+function processResult(token) {
+
+    console.log("processResult", token);
+    var parts = token.split('.');
+    var base64UrlEncoder = new Jose.Utils.Base64Url();
+    var header = JSON.parse(base64UrlEncoder.decode(parts[0]));
+    var payload = JSON.parse(base64UrlEncoder.decode(parts[1]));
+    var signature = base64UrlEncoder.decode(parts[0]);
+
+    console.log("header", header);
+    console.log("sub_jwk", payload.sub_jwk);
+
+    if (verifyPayload(header, payload)) {
+        verifySignature(token,header,payload).then( 
+            function(verification) {
+                var res = verification[0];
+                if (res.verified) {
+                    $("#svipe").hide();
+                    $("#result").show();
+                    console.log(res);
+                    let parsed = JSON.parse(res.payload);
+                    console.log("parsed",parsed);
+                    var str = JSON.stringify(parsed);
+                    $("#json").html(str);
+                } else {
+                    console.log("Could not verify signature");
+                }
+            }
+        ).catch(
+            function (err) {
+                console.log("verify signature failed: " ,err);
+                return false;
+            }
+        );
+    } else {
+        console.log("Could not verify payload");
+    }
+
+}
+
+function setupSocket() {
+
+    console.log("setupSocket");
+
+    const socket = io('https://socket.svipe.net');
+    //const socket = io('http://localhost:8080');
+
+    if (socket == null ) {
+        console.log("Socket could not be opened");
+        return;
+    }
+
+    var helloMsg = {op: 'hello'};
+    console.log("emit ", helloMsg);
+    socket.emit("message", helloMsg);
+    socket.on("message", function(msg) {
+        console.log("received ",msg);
+        if (msg.op == "hello" && msg.token != null) {
+            // this is uuid token
+            var token = msg.token;
+            if (token != null) {
+                console.log("received uuid token", msg.token);
+                generateQRCode(msg.token);
+            } else {
+                console.error("No token received");
+            }
+        } else if (msg.op == "progress") {
+            showProgress();
+        } else if (msg.op == "authdone") {
+            var jwt = msg.jwt;
+            if (jwt != null) {
+                console.log("received jwt token", jwt);
+                socket.close();
+                $("#myModal").hide();
+                processResult(jwt);
+            } else {
+                console.error("No jwt token received");
+            }
+        } else {
+            console.error("Could not contact socket server")
+        }
+    });   
+}
+
+</script>
+</html>
