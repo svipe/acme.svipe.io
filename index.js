@@ -51,7 +51,7 @@ app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
 
-    console.log("memoryStore", memoryStore);
+    //console.log("memoryStore", memoryStore);
 
     var session = req.session;
     var sessionID = req.sessionID;
@@ -59,17 +59,16 @@ app.get('/', (req, res) => {
     var redirect_uri = req.query["redirect_uri"];
     var claims = req.query["claims"];
     session.redirect_uri = redirect_uri;
-    console.log("session", session);
+    //console.log("session", session);
     console.log("sessionID", sessionID);
-    console.log("session.store", session.store);
+    //console.log("session.store", session.store);
  
     var hostname = url.parse(redirect_uri).hostname;
-    var configURL = "https://" + url.parse(redirect_uri).hostname + "/.well-known/svipe-configuration.json";
+    var configURL = "https://" + hostname + "/.well-known/svipe-configuration.json";
     console.log(configURL);
 
     retrieveConf(configURL).then( function(json) {
         generateQRCode(sessionID,redirect_uri, claims).then(function(srcpic) {
-
             res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic});
         });
     }).catch(error => {
@@ -116,7 +115,7 @@ app.post('/', (req, res) => {
 
       if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
-        console.log(msg);
+        console.log("msg",msg);
         socket.emit("message", msg);
         delete clients[uuid];
         res.end(statusOK);
@@ -137,7 +136,7 @@ app.post('/progress', (req, res) => {
     var statusNOK = JSON.stringify({status:'NOK'});
     var socket = clients[uuid];
     if (socket != undefined || socket != null ) {
-      console.log("Has client for ", uuid);
+      console.log("Has client to showProgress for ", uuid);
       var msg = {op:'progress', jwt: "scanned"};
       socket.emit("message", msg);
       res.end(statusOK);
@@ -149,22 +148,6 @@ app.post('/progress', (req, res) => {
 async function retrieveConf(configURL){
     return await fetch(configURL)
     .then(res => res.json())
-}
-
-
-function verifyRP(redirect_uri) {
-
-    console.log("verifyRP",redirect_uri);
-    var hostname = url.parse(redirect_uri).hostname;
-    if (!hostname) {
-        return null;
-    }
-
-    var configURL = "https://" + url.parse(redirect_uri).hostname + "/.well-known/svipe-configuration.json";
-    console.log(configURL);
-
-    return retrieveConf(configURL) ;
-    
 }
 
 function verifyPayload(header, payload) {
