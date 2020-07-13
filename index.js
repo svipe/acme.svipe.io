@@ -252,7 +252,11 @@ function composeQuery(sessionID,redirect_uri, claims) {
   
     //var socket_uri = "https://auth.svipe.io";
 
-    queryString = "?client_id="+redirect_uri+"&nonce="+nonce+"&claims="+claims;
+    if (claims)  {
+        queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+claims;
+    } else {
+        queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce;
+    }
     console.log("claims", claims);
     console.log("queryString", queryString);
     return "openid://" + queryString;

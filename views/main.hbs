@@ -45,6 +45,7 @@
               <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
             </div>
         </div>
+        <div id="promotion" class="modal-body text-center"><p>If you do not have the app installed on your phone you can download it here.</p><a href="itms-apps://itunes.apple.com/app/apple-store/id375380948?mt=8"><img src="/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"></a></div>
 </body>
 
 </html>
@@ -61,6 +62,7 @@ $(document).ready(function() {
 
 function showProgress() {
     $("#signup").hide();
+    $("#promotion").hide();
     $("#progress").show();
 }
 
