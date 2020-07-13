@@ -17,6 +17,8 @@ const jws = require('jws-jwk');
 const fetch = require('node-fetch');
 var url = require('url');
 
+var isCompact = false;
+
 var SvipeIDConfig = {
 	client_id: null,
 	registration: null 
@@ -68,7 +70,8 @@ app.get('/', (req, res) => {
     console.log(configURL);
 
     retrieveConf(configURL).then( function(json) {
-        generateQRCode(sessionID,redirect_uri, claims).then(function(srcpic) {
+
+        generateQRCode(sessionID,redirect_uri, claims,json.registration).then(function(srcpic) {
             res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic});
         });
     }).catch(error => {
@@ -141,6 +144,7 @@ app.post('/progress', (req, res) => {
       socket.emit("message", msg);
       res.end(statusOK);
     } else {
+      console.error("Could not find client to showProgress for ", uuid);
       res.end(statusNOK);
     }
 });
@@ -195,29 +199,19 @@ function verifyPayload(header, payload) {
     }
     console.log("payload verified");
     return true;
-
 }
 
-function generateQRCode(sessionID,redirect_uri, claims) {
-
-    var queryString = composeQuery(sessionID,redirect_uri, claims);
-    console.log("queryString",queryString);
-    return QRCode.toDataURL(queryString);
+function generateQRCode(sessionID,redirect_uri, claims,registration) {
+    var urlString = composeQuery(sessionID,redirect_uri, claims,registration);
+    console.log("URL ",urlString);
+    return QRCode.toDataURL(urlString);
 }
 
-function composeQuery(sessionID,redirect_uri, claims) {
+function composeQuery(sessionID,redirect_uri, claims,registration) {
   
     var nonce = sessionID;
     var state = sessionID;
-    var registration = "";
-    var SvipeIDConfig = {};
-
-    var client_id = encodeURIComponent(SvipeIDConfig.client_id);
-    if (SvipeIDConfig !=null && SvipeIDConfig.registration != null ) {
-        $("#profile__logo__app-image").attr("src",SvipeIDConfig.registration);
-        var registration = encodeURIComponent(SvipeIDConfig.registration);
-    }
-      
+  
     // make token
   
     var jwt = {response_type: "id_token", client_id: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
@@ -232,16 +226,19 @@ function composeQuery(sessionID,redirect_uri, claims) {
     // var url = "openid://"+jwt_token;
     // var url = "openid://?response_type=id_token&client_id="+client_id+"&scope=openid%20profile&state="+state+"&nonce="+nonce+"&registration="+registration+"&claims="+claims;
     // To keep the QR code eligible we need to minimize the length. Maybe make most of the clientid default as well using well-known example.com
-  
     //var socket_uri = "https://auth.svipe.io";
 
-    if (claims)  {
-        queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+claims;
+    if (isCompact) {
+        queryString = jwt_token
     } else {
-        queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce;
+        if (claims)  {
+            queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+claims;
+        } else {
+            queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce;
+        }
     }
+
     console.log("claims", claims);
-    console.log("queryString", queryString);
     return "openid://" + queryString;
 
  }
