@@ -67,7 +67,7 @@ app.get('/', (req, res) => {
  
     if (redirect_uri) {
     var hostname = url.parse(redirect_uri).hostname;
-    var configURL = "https://" + hostname + "/.well-known/svipe-configuration.json";
+    var configURL = "https://" + hostname + "/.well-known/svipe-configuration";
     console.log(configURL);
 
     retrieveConf(configURL).then( function(json) {
