@@ -65,6 +65,7 @@ app.get('/', (req, res) => {
     console.log("sessionID", sessionID);
     //console.log("session.store", session.store);
  
+    if (redirect_uri) {
     var hostname = url.parse(redirect_uri).hostname;
     var configURL = "https://" + hostname + "/.well-known/svipe-configuration.json";
     console.log(configURL);
@@ -77,7 +78,9 @@ app.get('/', (req, res) => {
     }).catch(error => {
         console.error('Error during service worker registration:', error);
       });
-
+    } else {
+        res.redirect("https://app.svipe.com")
+    }
     /*
     console.log("All sessions");
     memoryStore.all(function (error,sessions) {
