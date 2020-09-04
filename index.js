@@ -60,6 +60,7 @@ app.get('/', (req, res) => {
     var referrer = req.get('Referrer');
     var redirect_uri = req.query["redirect_uri"];
     var claims = req.query["claims"];
+    var sign = req.query["sign"];
     session.redirect_uri = redirect_uri;
     //console.log("session", session);
     console.log("sessionID", sessionID);
@@ -72,7 +73,7 @@ app.get('/', (req, res) => {
 
     retrieveConf(configURL).then( function(json) {
 
-        generateQRCode(sessionID,redirect_uri, claims,json.registration).then(function(srcpic) {
+        generateQRCode(sessionID,redirect_uri, sign,claims,json.registration).then(function(srcpic) {
             res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic});
         });
     }).catch(error => {
@@ -204,20 +205,20 @@ function verifyPayload(header, payload) {
     return true;
 }
 
-function generateQRCode(sessionID,redirect_uri, claims,registration) {
-    var urlString = composeQuery(sessionID,redirect_uri, claims,registration);
+function generateQRCode(sessionID,redirect_uri, sign,claims,registration) {
+    var urlString = composeQuery(sessionID,redirect_uri, sign,claims,registration);
     console.log("URL ",urlString);
     return QRCode.toDataURL(urlString);
 }
 
-function composeQuery(sessionID,redirect_uri, claims,registration) {
+function composeQuery(sessionID,redirect_uri, sign, claims,registration) {
   
     var nonce = sessionID;
     var state = sessionID;
   
     // make token
   
-    var jwt = {response_type: "id_token", client_id: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    var jwt = {response_type: "id_token", client_id: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims, sign:sign};
   
     console.log("jwt",jwt);
   
@@ -234,10 +235,15 @@ function composeQuery(sessionID,redirect_uri, claims,registration) {
     if (isCompact) {
         queryString = jwt_token
     } else {
+
         if (claims)  {
             queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+claims;
         } else {
             queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce;
+        }
+
+        if (sign) {
+            queryString += "&sign=" + encodeURIComponent(sign);
         }
     }
 
