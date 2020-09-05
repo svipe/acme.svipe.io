@@ -72,7 +72,6 @@ app.get('/', (req, res) => {
     console.log(configURL);
 
     retrieveConf(configURL).then( function(json) {
-
         generateQRCode(sessionID,redirect_uri, sign,claims,json.registration).then(function(srcpic) {
             res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic, sign: sign});
         });
@@ -237,7 +236,7 @@ function composeQuery(sessionID,redirect_uri, sign, claims,registration) {
     } else {
 
         if (claims)  {
-            queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+claims;
+            queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+encodeURIComponent(claims);
         } else {
             queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce;
         }
