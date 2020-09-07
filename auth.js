@@ -66,14 +66,16 @@ app.get('/', (req, res) => {
     console.log("sessionID", sessionID);
     //console.log("session.store", session.store);
  
-    if (redirect_uri) {
-    var hostname = url.parse(redirect_uri).hostname;
-    var configURL = "https://" + hostname + "/.well-known/svipe-configuration";
-    console.log(configURL);
+    console.log("redirect_uri", redirect_uri);
+    
+    if (redirect_uri!=null) {
+        var hostname = url.parse(redirect_uri).hostname;
+        var configURL = "https://" + hostname + "/.well-known/svipe-configuration";
+        console.log(configURL);
 
-    retrieveConf(configURL).then( function(json) {
-        generateQRCode(sessionID,redirect_uri, sign,claims,json.registration).then(function(srcpic) {
-            res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic, sign: sign});
+        retrieveConf(configURL).then( function(json) {
+            generateQRCode(sessionID,redirect_uri, sign,claims,json.registration).then(function(srcpic) {
+                res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic, sign: sign});
         });
     }).catch(error => {
         console.error('Error during service worker registration:', error);
