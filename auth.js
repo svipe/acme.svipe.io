@@ -249,7 +249,7 @@ function composeQuery(sessionID,redirect_uri, sign, claims,registration) {
     }
 
     console.log("claims", claims);
-    return "https://app.svipe.com/" + queryString;
+    return "openid://" + queryString;
 
  }
 
