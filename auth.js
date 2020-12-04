@@ -16,7 +16,7 @@ const base64url = require('base64url');
 const jws = require('jws-jwk');
 const fetch = require('node-fetch');
 var url = require('url');
-
+require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
 var isCompact = false;
 
 var SvipeIDConfig = {
@@ -72,7 +72,6 @@ app.get('/', (req, res) => {
         var hostname = url.parse(redirect_uri).hostname;
         var configURL = "https://" + hostname + "/.well-known/svipe-configuration";
         console.log(configURL);
-
         retrieveConf(configURL).then( function(json) {
             generateQRCode(sessionID,redirect_uri, sign,claims,json.registration).then(function(srcpic) {
                 res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic, sign: sign});
