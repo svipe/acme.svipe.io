@@ -74,10 +74,11 @@ app.get('/', (req, res) => {
         console.log(configURL);
         retrieveConf(configURL).then( function(json) {
             generateQRCode(sessionID,redirect_uri, sign,claims,json.registration).then(function(srcpic) {
-                res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic, sign: sign});
+                res.render('main', {layout: 'index', logo: json.registration,  redirect_uri: redirect_uri, sessionID: sessionID, referrer: referrer, domain: hostname, srcpic: srcpic, sign: sign, claims: claims});
         });
     }).catch(error => {
         console.error('Error during service worker registration:', error);
+        res.redirect("https://app.svipe.com");
       });
     } else {
         res.redirect("https://app.svipe.com")
