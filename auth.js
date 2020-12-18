@@ -164,7 +164,7 @@ function verifyPayload(header, payload) {
     // First the basics
 
     if (payload.sub_jwk === undefined) {
-        console.err("sub_jwk missing");
+        console.error("sub_jwk missing");
         return false;
     }
 
@@ -176,13 +176,12 @@ function verifyPayload(header, payload) {
     */
 
     if (payload.exp === undefined) {
-        console.err("exp missing");
+        console.error("exp missing");
         return false;
     }
 
-
     if (payload.aud === undefined) {
-        console.err("aud missing");
+        console.error("aud missing");
         return false;
     } /*else if (Array.isArray(payload.aud)) {
         if (!payload.aud.includes(SvipeIDConfig.client_id)) {
