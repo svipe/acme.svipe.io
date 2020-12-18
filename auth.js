@@ -168,10 +168,12 @@ function verifyPayload(header, payload) {
         return false;
     }
 
+    /* This is considered optional according to the standard and seems to cause problems with Android versions.
     if (payload.iat === undefined) {
         console.err("iat missing");
         return false;
     }
+    */
 
     if (payload.exp === undefined) {
         console.err("exp missing");
