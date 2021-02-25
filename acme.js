@@ -47,8 +47,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Change when going live
-//var host = "https://acme.svipe.io";
-var host = "http://localhost:"+port;
+var host = "https://acme.svipe.io";
+//var host = "http://localhost:"+port;
 
 app.get('/', (req, res) => {
     var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
@@ -172,7 +172,7 @@ function verifyPayload(header, payload) {
 }
 
 function generateQRCode(sessionID,redirect_uri,claims,registration) {
-    
+
     var nonce = sessionID;
     var state = sessionID;
   
