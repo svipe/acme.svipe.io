@@ -62,6 +62,51 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/callback', (req, res) => {
+
+    var uuid = req.body.uuid;
+    var statusOK = JSON.stringify({status:'OK'});
+    var statusNOK = JSON.stringify({status:'NOK'});
+  
+    var socket = clients[uuid];
+    if (socket != undefined || socket != null ) {
+      console.log("Has client for ", uuid);
+      // now we need to verify stuff before forwarding...
+      var token = req.body.jwt;
+      var parts = token.split('.');
+      
+      var header = JSON.parse(base64url.decode(parts[0]));
+      var payload = JSON.parse(base64url.decode(parts[1]));
+      var signature = base64url.decode(parts[2]);
+
+      var sub_jwk = payload.sub_jwk;
+      var sub = payload.sub;
+
+      console.log("sub_jwk", sub_jwk);
+      console.log("sub", sub);
+
+      console.log("verify payload",verifyPayload(header, payload));
+      //console.log("verify signature", jws.verify(signature,sub_jwk));
+      // EC keys not supported....
+
+      var isVerified = verifyPayload(header, payload);
+
+      if (isVerified) {
+        var msg = {op:'authdone', jwt: token, sub: sub};
+        console.log("msg",msg);
+        socket.emit("message", msg);
+        delete clients[uuid];
+        res.end(statusOK);
+      } else {
+        console.error("could not verify token");
+        res.end(statusNOK);
+      }
+    } else {
+      res.end(statusNOK);
+    }
+    
+})
+
 app.post('/callback', (req, res) => {
 
     var uuid = req.body.uuid;
