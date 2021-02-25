@@ -1,16 +1,14 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Svipe iD Demo Example</title>
+<title>Acme Login</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-<link rel="icon" href="https://demo.svipe.com/demo-icon.png" />
+<link rel="icon" href="https://acme.svipe.com/logo.png" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
 <style>
     html, body { height: 100%;}
     .container {
@@ -21,41 +19,36 @@
     }
 </style>
 </head>
-
 <body>
-    <!-- The modal -->
     <div >
-        <div class="modal-header">
-            <h4 class="modal-title"><img width=25 height=25 src=https://is1-ssl.mzstatic.com/image/thumb/Purple113/v4/b5/83/4e/b5834e32-3b00-51c5-d875-4309e40780a4/pr_source.png/150x150bb-80.png></img> Svipe iD</h4>
-        </div>
         <div class="modal-body text-center">
             <div class="profile__logo" id="" aria-hidden="true" >
                 <p>
-                    <img id="profile__logo__app-image" height=72 width=72 src="{{{logo}}}"></img>
+                    <img id="profile__logo__app-image" height=100  src="{{{logo}}}"></img>
                 </p>
             </div>
+            <div id = "signin">
+                <h3>
+                <a href = "javascript:showQR()">Sign in with Svipe iD</a>
+                </h3>
+            </div>
             <div id="signup">
-                {{#if sign}}
-                <p>To sign :<br><strong>{{{sign}}}</strong><br>at <strong>{{{domain}}}</strong> using your Svipe iD, please scan this code</p>
-                {{else}}
                 <p>To sign in to <strong>{{{domain}}}</strong> using your Svipe iD, please scan this code</p>
-                {{/if}}
                 <div id="qrcode"><img src={{{srcpic}}} width="50%"></div>
             </div>
             <div id="progress">
                 <p>Waiting for approval of the disclosure request</p>
             </div>
-            <div>
+            <div id="cancel">
               <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
             </div>
         </div>
         <div id="promotion" class="modal-body text-center">
             <p>If you do not have the app installed on your phone you can download it here.</p>
             <a href="https://apps.apple.com/se/app/svipe-id/id1496637920"><img height=40 src="/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"></a>
-            <a href="https://play.google.com/apps/testing/se.svipe"><img height=40 src="/google-play.png"></a>
-            </div>
+            <a href="https://play.google.com/store/apps/details?id=se.svipe"><img height=40 src="/google-play.png"></a>
+        </div>
 </body>
-
 </html>
 
 <script type="text/javascript">
@@ -64,33 +57,34 @@ var redirect_uri = "{{{redirect_uri}}}";
 
 $(document).ready(function() {
   setupSocket();
+  $("#signup").hide();
+  $("#cancel").hide();
   $("#progress").hide();
 });
 
+function showQR() {
+    $("#signin").hide();
+    $("#signup").show();
+    $("#cancel").show();
+}
 
 function showProgress() {
     $("#signup").hide();
     $("#promotion").hide();
+    $("#cancel").show();
     $("#progress").show();
 }
 
 function setupSocket() {
-
-    console.log("setupSocket");
-
-    const socket = io('https://auth.svipe.io');
-    //const socket = io('http://localhost:4000');
-
+    
+    //const socket = io('https://acme.svipe.io');
+    const socket = io('http://localhost:4567');
     if (socket == null ) {
-        console.log("Socket could not be opened");
+        console.error("Socket could not be opened");
         return;
     }
-
     var helloMsg = {op: 'hello', uuid: '{{{sessionID}}}' };
-
-    console.log("emit ", helloMsg);
     socket.emit("message", helloMsg);
-
     socket.on("message", function(msg) {
         console.log("received ",msg);
         if (msg.op == "hello") {
@@ -104,7 +98,7 @@ function setupSocket() {
             if (jwt != null) {
                 console.log("received jwt token", jwt);
                 socket.close();
-                window.location.href = redirect_uri + "?jwt=" + jwt + "&sub=" + sub;
+                window.location.href = redirect_uri + "?jws=" + jwt + "&sub=" + sub;
                 // Now redirect 
             } else {
                 console.error("No jwt token received");
@@ -114,5 +108,4 @@ function setupSocket() {
         }
     });   
 }
-
 </script>
