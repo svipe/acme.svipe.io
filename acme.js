@@ -104,10 +104,10 @@ app.get('/callback', (req, res) => {
     } else {
       res.end(statusNOK);
     }
-    
+
 })
 
-app.post('/callback', (req, res) => {
+app.post('/', (req, res) => {
 
     var uuid = req.body.uuid;
     var statusOK = JSON.stringify({status:'OK'});
