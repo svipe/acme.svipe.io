@@ -56,13 +56,13 @@ app.use(bodyParser.json());
 // Change when going live
 var host = "https://acme.svipe.io";
 //var host = "http://localhost:"+port;
-
+var aud = host + "/callback"; 
 const acmeKey = jose.JWK.asKey("0484d42314e4c3d961af1d58c7b7293d1e8d05dd931271b1a11c196db60f9e4ba13b4c3946bfa04a21ccff68341a7ec87b1f30bd6cc2c0ea46ace7b28ef88f20b5");
 
 app.get('/', (req, res) => {
     var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
     console.log(claims);
-    var redirect_uri = host + "/callback"; 
+    var redirect_uri = aud; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
     console.log(sessionID);
@@ -200,16 +200,15 @@ function verifyPayload(header, payload) {
     if (payload.aud === undefined) {
         console.error("aud missing");
         return false;
-    } /*else if (Array.isArray(payload.aud)) {
-        if (!payload.aud.includes(SvipeIDConfig.client_id)) {
-            console.error("client_id not in aud array");
+    } else if (Array.isArray(payload.aud)) {
+        if (!payload.aud.includes(aud)) {
+            console.error("aud not in aud array");
             return false;
         }
-    } else if (payload.aud === SvipeIDConfig.client_id) {
-        console.error("aud is not equal to client_id");
+    } else if (payload.aud === aud) {
+        console.error("payload.aud is not equal to aud");
         return false;
-    }*/
-
+    }
     
     if ( header.kid !== payload.sub) {
         console.error("sub must be equal to kid");
@@ -224,10 +223,11 @@ function verifyPayload(header, payload) {
     return true;
 }
 
-function generateQRCode(sessionID,redirect_uri,claims,registration) {
+function generateQRCode(sessionID, redirect_uri, claims, registration) {
+    
     var nonce = sessionID;
     var state = sessionID;
-    var payload = {response_type: "id_token", client_id: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    var payload = {response_type: "id_token", client_id: redirect_uri, aud: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
     console.log("payload",payload);
     const jwk  = acmeKey.toJWK(true);
     console.log(jwk);
