@@ -224,10 +224,10 @@ function verifyPayload(header, payload) {
 }
 
 function generateQRCode(sessionID, redirect_uri, claims, registration) {
-    
+
     var nonce = sessionID;
     var state = sessionID;
-    var payload = {response_type: "id_token", client_id: redirect_uri, aud: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    var payload = {response_type: "id_token", sub: client_id, client_id: redirect_uri, aud: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
     console.log("payload",payload);
     const jwk  = acmeKey.toJWK(true);
     console.log(jwk);
