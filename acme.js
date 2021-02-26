@@ -68,6 +68,10 @@ var host = "https://"+domain;
 
 const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
 
+//const acmeKey = jose.JWK.asKey("7c3de020a79770277387799c2f04bfd20f8528ab733b506c13ba0625794687ad");
+
+console.log(acmeKey.public);
+
 app.get('/', (req, res) => {
     var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
     console.log(claims);
@@ -239,6 +243,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
     var state = sessionID;
     const jwk  = acmeKey.toJWK(true);
     console.log(jwk);
+    
    /* ECKey {
         crv: 'secp256k1',
         kid: 'tAt8egTOmgVfprY2yzwD_Pi7BWPT-6HR2-ruSjZVgMs',
