@@ -257,7 +257,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
     };
 
     var payload = {response_type: "id_token", iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
-    scope:"openid profile", state: state, nonce: nonce, registration: registration};
+    scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
     console.log("payload",payload);
     
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
