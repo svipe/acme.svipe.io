@@ -14,7 +14,7 @@ const app = express();
 const handlebars = require('express-handlebars');
 const session = require('express-session');
 const QRCode = require('qrcode');
-
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
