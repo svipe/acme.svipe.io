@@ -53,20 +53,22 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+var domain = "acme.svipe.io";
 // Change when going live
-var host = "https://acme.svipe.io";
+var host = "https://"+domain;
 //var host = "http://localhost:"+port;
-var aud = host + "/callback"; 
+
 const acmeKey = jose.JWK.asKey("0484d42314e4c3d961af1d58c7b7293d1e8d05dd931271b1a11c196db60f9e4ba13b4c3946bfa04a21ccff68341a7ec87b1f30bd6cc2c0ea46ace7b28ef88f20b5");
 
 app.get('/', (req, res) => {
     var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
     console.log(claims);
-    var redirect_uri = aud; 
+    var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
+    var aud = domain; 
     console.log(sessionID);
-    generateQRCode(sessionID, redirect_uri, claims, logo).then(function(srcpic) {
+    generateQRCode(sessionID, redirect_uri, aud, claims, logo).then(function(srcpic) {
         res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: claims});
     });
 });
@@ -95,7 +97,7 @@ app.get('/callback', (req, res) => {
       console.log("verify payload",verifyPayload(header, payload));
       //console.log("verify signature", jws.verify(signature,sub_jwk));
       // EC keys not supported....
-      var isVerified = verifyPayload(header, payload);
+      var isVerified = verifyPayload(header, payload, domain);
 
       if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
@@ -174,7 +176,7 @@ app.post('/progress', (req, res) => {
     }
 });
 
-function verifyPayload(header, payload) {
+function verifyPayload(header, payload, aud) {
 
     // First the basics
 
@@ -195,7 +197,7 @@ function verifyPayload(header, payload) {
         return false;
     }
 
-    console.log("aud",payload.aud);
+    console.log("aud", payload.aud);
 
     if (payload.aud === undefined) {
         console.error("aud missing");
@@ -223,19 +225,21 @@ function verifyPayload(header, payload) {
     return true;
 }
 
-function generateQRCode(sessionID, redirect_uri, claims, registration) {
+function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
 
     var nonce = sessionID;
     var state = sessionID;
-    var payload = {response_type: "id_token", sub: redirect_uri, aud: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
-    console.log("payload",payload);
     const jwk  = acmeKey.toJWK(true);
+    
+    var payload = {response_type: "id_token", sub: jwk.kid, sub_jwk: jwk, aud: aud, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    console.log("payload",payload);
+    
     console.log(jwk);
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
         {
             header: {
                 typ: 'JWT',
-                jwk: jwk
+                kid: jwk.kid
             },
             expiresIn: "5m"
         }
