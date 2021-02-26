@@ -261,7 +261,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
         crv: jwk.crv
     };
 
-    var payload = {response_type: "id_token", iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
+    var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
     scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
     console.log("payload",payload);
     
