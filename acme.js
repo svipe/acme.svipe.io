@@ -241,7 +241,7 @@ function generateQRCode(sessionID,redirect_uri,claims,registration) {
         }
     );
     console.log(jwsCompact);
-    var urlString =  "openid://" + jwsCompact;
+    var urlString =  "https://app.svipe.io/auth/" + jwsCompact;
     console.log("URL ",urlString);
     return QRCode.toDataURL(urlString);
 }
