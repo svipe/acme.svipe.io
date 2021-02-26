@@ -23,7 +23,15 @@ var clients = {}; // Keep track of outstanding connections
 const base64url = require('base64url');
 const jose = require('jose');
 // need this?
-require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
+
+const {
+    JWE,   // JSON Web Encryption (JWE)
+    JWK,   // JSON Web Key (JWK)
+    JWKS,  // JSON Web Key Set (JWKS)
+    JWS,   // JSON Web Signature (JWS)
+    JWT,   // JSON Web Token (JWT)
+    errors // errors utilized by jose
+  } = jose;
 
 const port = 4567;
 
@@ -59,6 +67,7 @@ var host = "https://"+domain;
 //var host = "http://localhost:"+port;
 
 const acmeKey = jose.JWK.asKey("0484d42314e4c3d961af1d58c7b7293d1e8d05dd931271b1a11c196db60f9e4ba13b4c3946bfa04a21ccff68341a7ec87b1f30bd6cc2c0ea46ace7b28ef88f20b5");
+
 
 app.get('/', (req, res) => {
     var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
@@ -230,15 +239,23 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
     var nonce = sessionID;
     var state = sessionID;
     const jwk  = acmeKey.toJWK(true);
-    
-    var payload = {response_type: "id_token", sub: jwk.kid, sub_jwk: jwk, aud: aud, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    console.log(jwk);
+
+    var sub_jwk =  {
+        y: jwk.y,
+        use: "sig",
+        x: jwk.x,
+        kty: "EC",
+        crv: jwk.crv
+    };
+
+    var payload = {response_type: "id_token", sub: jwk.kid, sub_jwk: sub_jwk, aud: aud, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
     console.log("payload",payload);
     
-    console.log(jwk);
+    
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
         {
             header: {
-                typ: 'JWT',
                 kid: jwk.kid
             },
             expiresIn: "5m"
