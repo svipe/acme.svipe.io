@@ -1,24 +1,30 @@
+/*
+
+A simple example of how to sign a JWT with an Openid request.
+
+1. A websocket is established with a unique sesssion id
+2. The JWS is created and send to the handlebars in the form of a QR code
+3. When the user clicks Sign in the QR code is revealed.
+4. 
+
+*/
+
 const express = require('express');
 const app = express();
-
 const handlebars = require('express-handlebars');
 const session = require('express-session');
-var jwt = require('express-jwt');
 const QRCode = require('qrcode');
-const { Store } = require('express-session');
+
 const bodyParser = require('body-parser');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const cors = require('cors');
 var clients = {}; // Keep track of outstanding connections
 const base64url = require('base64url');
-const jws = require('jws-jwk');
 const jose = require('jose');
-
-var url = require('url');
+// need this?
 require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
 
-var isCompact = true;
 const port = 4567;
 
 let memoryStore = new session.MemoryStore();
@@ -45,7 +51,6 @@ app.use(session({
   }));
 
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.use(bodyParser.json());
 
 // Change when going live
@@ -85,14 +90,11 @@ app.get('/callback', (req, res) => {
 
       var sub_jwk = payload.sub_jwk;
       var sub = payload.sub;
-
       console.log("sub_jwk", sub_jwk);
       console.log("sub", sub);
-
       console.log("verify payload",verifyPayload(header, payload));
       //console.log("verify signature", jws.verify(signature,sub_jwk));
       // EC keys not supported....
-
       var isVerified = verifyPayload(header, payload);
 
       if (isVerified) {
@@ -193,6 +195,8 @@ function verifyPayload(header, payload) {
         return false;
     }
 
+    console.log("aud",payload.aud);
+
     if (payload.aud === undefined) {
         console.error("aud missing");
         return false;
@@ -206,7 +210,7 @@ function verifyPayload(header, payload) {
         return false;
     }*/
 
-
+    
     if ( header.kid !== payload.sub) {
         console.error("sub must be equal to kid");
         return false;
@@ -221,12 +225,8 @@ function verifyPayload(header, payload) {
 }
 
 function generateQRCode(sessionID,redirect_uri,claims,registration) {
-
     var nonce = sessionID;
     var state = sessionID;
-  
-    // make token
-  
     var payload = {response_type: "id_token", client_id: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
     console.log("payload",payload);
     const jwk  = acmeKey.toJWK(true);
@@ -241,23 +241,7 @@ function generateQRCode(sessionID,redirect_uri,claims,registration) {
         }
     );
     console.log(jwsCompact);
-
-    var jwt_string = JSON.stringify(payload);
-    var jwt_token = Buffer.from(jwt_string).toString('base64');
-
-    console.log("jwt_token",jwt_token);
-  
-    if (isCompact) {
-        queryString = jwsCompact
-    } else {
-        if (claims)  {
-            queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+encodeURIComponent(claims);
-        } else {
-            queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce;
-        }
-    }
-    console.log("claims", claims);
-    var urlString =  "openid://" + queryString;
+    var urlString =  "openid://" + jwsCompact;
     console.log("URL ",urlString);
     return QRCode.toDataURL(urlString);
 }
