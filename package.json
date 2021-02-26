@@ -15,6 +15,7 @@
     "express-handlebars": ">=4.3.0",
     "express-jwt": "^6.0.0",
     "express-session": "^1.17.1",
+    "jose": "^1.28.0",
     "jose-jwe-jws": "^0.2.2",
     "jws": "^4.0.0",
     "jws-jwk": "^0.1.4",

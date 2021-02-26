@@ -13,10 +13,12 @@ const cors = require('cors');
 var clients = {}; // Keep track of outstanding connections
 const base64url = require('base64url');
 const jws = require('jws-jwk');
+const jose = require('jose');
+
 var url = require('url');
 require('https').globalAgent.options.ca = require('ssl-root-cas/latest').create();
 
-var isCompact = false;
+var isCompact = true;
 const port = 4567;
 
 let memoryStore = new session.MemoryStore();
@@ -49,6 +51,8 @@ app.use(bodyParser.json());
 // Change when going live
 var host = "https://acme.svipe.io";
 //var host = "http://localhost:"+port;
+
+const acmeKey = jose.JWK.asKey("0484d42314e4c3d961af1d58c7b7293d1e8d05dd931271b1a11c196db60f9e4ba13b4c3946bfa04a21ccff68341a7ec87b1f30bd6cc2c0ea46ace7b28ef88f20b5");
 
 app.get('/', (req, res) => {
     var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
@@ -223,17 +227,28 @@ function generateQRCode(sessionID,redirect_uri,claims,registration) {
   
     // make token
   
-    var jwt = {response_type: "id_token", client_id: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
-  
-    console.log("jwt",jwt);
-  
-    var jwt_string = JSON.stringify(jwt);
+    var payload = {response_type: "id_token", client_id: redirect_uri, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    console.log("payload",payload);
+    const jwk  = acmeKey.toJWK(true);
+    console.log(jwk);
+    var jwsCompact = jose.JWT.sign(payload, acmeKey, 
+        {
+            header: {
+                typ: 'JWT',
+                jwk: jwk
+            },
+            expiresIn: "5m"
+        }
+    );
+    console.log(jwsCompact);
+
+    var jwt_string = JSON.stringify(payload);
     var jwt_token = Buffer.from(jwt_string).toString('base64');
 
     console.log("jwt_token",jwt_token);
   
     if (isCompact) {
-        queryString = jwt_token
+        queryString = jwsCompact
     } else {
         if (claims)  {
             queryString = "?client_id="+encodeURIComponent(redirect_uri)+"&nonce="+nonce+"&claims="+encodeURIComponent(claims);
