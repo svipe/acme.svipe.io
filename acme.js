@@ -69,7 +69,8 @@ var host = "https://"+domain;
 const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
 
 app.get('/', (req, res) => {
-    var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
+    //var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
+    var claims = {"svipeid": {"essential":true}};
     console.log(claims);
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
