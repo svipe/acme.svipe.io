@@ -246,7 +246,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
         use: "sig",
         x: jwk.x,
         kty: "EC",
-        crv: jwk.crv
+        crv: "P-256"
     };
 
     var payload = {response_type: "id_token", sub: jwk.kid, sub_jwk: sub_jwk, aud: aud, scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
