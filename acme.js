@@ -252,8 +252,8 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
         use: "sig",
         kid: jwk.kid,
         x: jwk.x,
-        kty: "EC",
-        crv: "P-256"
+        kty: jwk.kty,
+        crv: jwk.crv
     };
 
     var payload = {response_type: "id_token", iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
