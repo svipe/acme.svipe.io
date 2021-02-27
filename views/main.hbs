@@ -35,20 +35,21 @@
             </div>
             <div id="signup">
                 <p>To sign in using your Svipe iD, please scan this code</p>
+                <!-- How to do this dynamically using handlebars? -->
+                <p>You will be asked to share: given name, family name and svipeid
                 <div id="qrcode"><img src={{{srcpic}}} width="50%"></div>
+                <div id="progress">
+                    <p>Waiting for approval of the selective disclosure request</p>
+                </div>
+                <div id="cancel">
+                <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
+                </div>
             </div>
-            <div id="progress">
-                <p>Waiting for approval of the selective disclosure request</p>
+            <div id="promotion" class="modal-body text-center">
+                <p>If you do not have the app installed on your phone you can download it here.</p>
+                <a href="https://apps.apple.com/se/app/svipe-id/id1496637920"><img height=40 src="/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"></a>
+                <a href="https://play.google.com/store/apps/details?id=se.svipe"><img height=40 src="/google-play.png"></a>
             </div>
-            <div id="cancel">
-              <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
-            </div>
-        </div>
-        <div id="promotion" class="modal-body text-center">
-            <p>If you do not have the app installed on your phone you can download it here.</p>
-            <a href="https://apps.apple.com/se/app/svipe-id/id1496637920"><img height=40 src="/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"></a>
-            <a href="https://play.google.com/store/apps/details?id=se.svipe"><img height=40 src="/google-play.png"></a>
-        </div>
     
         <a href="https://github.com/svipe/acme.svipe.io" class="github-corner" aria-label="View source on GitHub">
             <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
@@ -63,6 +64,7 @@
 <script type="text/javascript">
 
 var redirect_uri = "{{{redirect_uri}}}";
+
 
 $(document).ready(function() {
   setupSocket();

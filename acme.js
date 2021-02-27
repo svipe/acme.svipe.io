@@ -78,13 +78,15 @@ var host = "https://"+domain;
 console.log(acmeKey.public);
 
 app.get('/', (req, res) => {
-    console.log(requests);
+   
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
     generateQRCode(sessionID, redirect_uri, aud, requests, logo).then(function(srcpic) {
+        requests.stringify = JSON.stringify(requests);
+        console.log("requests", requests);
         res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests});
     });
 });
