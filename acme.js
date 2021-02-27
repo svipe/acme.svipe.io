@@ -89,6 +89,11 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/welcome', (req, res) => {
+  console.log(requests);
+  res.render('welcome', {layout: 'index', logo: logo});
+})
+
 app.post('/callback', (req, res) => {
     console.log("callback");
 
@@ -154,7 +159,7 @@ app.post('/callback/progress', (req, res) => {
 function verifyPayload(header, payload, aud) {
 
     return true; // some verification fails
-    
+
     // First the basics
 
     if (payload.sub_jwk === undefined) {
