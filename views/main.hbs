@@ -99,8 +99,7 @@ function setupSocket() {
                 console.log("received jwt token", jwt);
                 socket.close();
                 // Now redirect 
-                window.location.href = "/welcome";
-
+                window.location.href = "/welcome/"+jwt;
             } else {
                 console.error("No jwt token received");
             }

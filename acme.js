@@ -89,10 +89,35 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/welcome', (req, res) => {
+app.get('/welcome/:jwt', (req, res) => {
   console.log(requests);
+  // hmm, need to verify again. in case the token was modfied in the browser
+  var token = req.body.jwt;
+  var parts = token.split('.');
+  var header = JSON.parse(base64url.decode(parts[0]));
+  var payload = JSON.parse(base64url.decode(parts[1]));
+  var signature = base64url.decode(parts[2]);
+
+  var sub_jwk = payload.sub_jwk;
+  var sub = payload.sub;
+  var isVerified = verifyPayload(header, payload, domain);
+
+  console.log("sub_jwk", sub_jwk);
+  console.log("sub", sub);
+  console.log("verify payload",isVerified);
   var logo = host + "/logo.png";
-  res.render('welcome', {layout: 'index', logo: logo});
+  var name = "";
+  var svipeid = payload.claims["svipeid"];
+  var given_name = payload.claims["given_name"];
+  var family_name = payload.claims["family_name"];
+  if (given_name) {
+    name += given_name;
+  }
+  if (family_name) {
+    name += " " + family_name;
+  }
+  res.render('welcome', {layout: 'index', logo: logo, name: name});
+
 })
 
 app.post('/callback', (req, res) => {
