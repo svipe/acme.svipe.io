@@ -77,6 +77,12 @@ var host = "https://"+domain;
 
 console.log(acmeKey.public);
 
+var arr = [ 'https://acme.svipe.io/callback' ];
+
+for (v in arr) {
+  console.log(v);
+}
+
 app.get('/', (req, res) => {
     console.log(requests);
     var redirect_uri = host+"/callback"; 
