@@ -257,13 +257,13 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
     var sub_jwk  = acmeKey.toJWK(true);
     sub_jwk.use = "sig"
 
-    var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
+    var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: sub_jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
     scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
     console.log("payload", payload);
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
         {
             header: {
-                kid: jwk.kid
+                kid: sub_jwk.kid
             },
             expiresIn: "5m"
         }
