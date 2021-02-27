@@ -73,9 +73,6 @@ var requests = {"svipeid": {"essential":true}, "given_name":null, "family_name":
 var host = "https://"+domain;
 //var host = "http://localhost:"+port; // For local dev
 
-//const acmeKey = jose.JWK.asKey("7c3de020a79770277387799c2f04bfd20f8528ab733b506c13ba0625794687ad");
-
-console.log(acmeKey.public);
 
 app.get('/', (req, res) => {
    
@@ -84,7 +81,7 @@ app.get('/', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-    generateQRCode(sessionID, redirect_uri, aud, requests, logo).then(function(response) {
+    generateQRCode(sessionID, redirect_uri, aud, requests, logo).then( function(response) {
         var srcpic = response; //.srcpic;
         var jwsCompact = "response.jwsCompact";
         console.log("requests", requests);
