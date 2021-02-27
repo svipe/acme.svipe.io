@@ -91,6 +91,7 @@ app.get('/', (req, res) => {
 
 app.get('/welcome', (req, res) => {
   console.log(requests);
+  var logo = host + "/logo.png";
   res.render('welcome', {layout: 'index', logo: logo});
 })
 
