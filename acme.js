@@ -253,17 +253,9 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
 
     var nonce = sessionID;
     var state = sessionID;
-    const jwk  = acmeKey.toJWK(true);
-    console.log(jwk);
-    
-    var sub_jwk =  {
-        y: jwk.y,
-        use: "sig",
-        kid: jwk.kid,
-        x: jwk.x,
-        kty: jwk.kty,
-        crv: jwk.crv
-    };
+ 
+    var sub_jwk  = acmeKey.toJWK(true);
+    sub_jwk.use = "sig"
 
     var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
     scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
