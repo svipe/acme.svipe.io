@@ -84,10 +84,12 @@ app.get('/', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-    generateQRCode(sessionID, redirect_uri, aud, requests, logo).then(function(srcpic) {
+    generateQRCode(sessionID, redirect_uri, aud, requests, logo).then(function(response) {
+        var srcpic = response; //.srcpic;
+        var jwsCompact = "response.jwsCompact";
         requests.stringify = JSON.stringify(requests);
         console.log("requests", requests);
-        res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests});
+        res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests,jwsCompact:jwsCompact});
     });
 });
 
@@ -277,7 +279,9 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
     console.log(jwsCompact);
     var urlString =  "https://app.svipe.io/auth/" + jwsCompact; // technically we could use openid:// to support other apps
     console.log("URL ",urlString);
-    return QRCode.toDataURL(urlString);
+    var ret =  {srcpic: QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
+    return ret.srcpic;
+    //return {srcpic: QRCode.toDataURL(urlString), jwsCompact: jwsCompact} ;
 }
 
 io.on('connection', socket => {
