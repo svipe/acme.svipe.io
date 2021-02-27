@@ -110,6 +110,7 @@ app.get('/welcome/:jws', (req, res) => {
     console.log("sub", sub);
     console.log("verify payload",isVerified);
     var logo = host + "/logo.png";
+    // could really do this in handlebars instead
     var name = "";
     var svipeid = payload.claims["svipeid"];
     var given_name = payload.claims["given_name"];
