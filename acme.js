@@ -78,7 +78,7 @@ var host = "https://"+domain;
 console.log(acmeKey.public);
 
 app.get('/', (req, res) => {
-    console.log(claims);
+    console.log(requests);
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
@@ -206,14 +206,6 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
     const jwk  = acmeKey.toJWK(true);
     console.log(jwk);
     
-   /* ECKey {
-        crv: 'secp256k1',
-        kid: 'tAt8egTOmgVfprY2yzwD_Pi7BWPT-6HR2-ruSjZVgMs',
-        kty: 'EC',
-        x: '1MtHIxlGP5TARqBccrddNm1FnYH1Fp-onETz5KbXPSc',
-        y: 'huRRsCjFFxnwJkmSatoBDVCxXsMMprfvW015IwWYYfA'
-      }*/
-      
     var sub_jwk =  {
         y: jwk.y,
         use: "sig",
@@ -225,9 +217,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
 
     var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
     scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
-
-    console.log("payload",payload);
-    
+    console.log("payload", payload);
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
         {
             header: {
@@ -237,7 +227,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
         }
     );
     console.log(jwsCompact);
-    var urlString =  "https://app.svipe.io/auth/" + jwsCompact;
+    var urlString =  "https://app.svipe.io/auth/" + jwsCompact; // technically we could use openid:// to support other apps
     console.log("URL ",urlString);
     return QRCode.toDataURL(urlString);
 }
