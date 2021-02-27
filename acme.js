@@ -93,6 +93,7 @@ app.get('/welcome/:jws', (req, res) => {
   // hmm, need to verify again. in case the token was modfied in the browser
   var token = req.params["jws"];
   if (token != null) {
+    console.log("token", token);
     var parts = token.split('.');
     var header = JSON.parse(base64url.decode(parts[0]));
     var payload = JSON.parse(base64url.decode(parts[1]));
