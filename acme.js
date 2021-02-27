@@ -85,7 +85,7 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/callback', (req, res) => {
+app.post('/callback', (req, res) => {
 
     console.log("callback");
     var uuid = req.body.uuid;
@@ -173,7 +173,9 @@ app.post('/', (req, res) => {
 
 });
 
-app.post('/progress', (req, res) => {
+// This must be relative to the client_id/redirect_uri
+
+app.post('/callback/progress', (req, res) => {
     var uuid = req.body.uuid;
     var statusOK = JSON.stringify({status:'OK'});
     var statusNOK = JSON.stringify({status:'NOK'});
