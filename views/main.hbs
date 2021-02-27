@@ -98,6 +98,7 @@ function setupSocket() {
             if (jwt != null) {
                 console.log("received jwt token", jwt);
                 socket.close();
+                
                 window.location.href = redirect_uri + "?jws=" + jwt + "&sub=" + sub;
                 // Now redirect 
             } else {

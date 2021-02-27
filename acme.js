@@ -120,7 +120,8 @@ app.post('/callback', (req, res) => {
         console.log("callback msg",msg);
         socket.emit("message", msg);
         delete clients[uuid];
-        // This is where you could set a cookie. The browser could also to a redirect to a Welcome page or such.
+        // This is where you could set a cookie. 
+        // The browser will redirect to the Welcome page specified by redirect_uri.
         res.end(statusOK);
       } else {
         console.error("could not verify token");
@@ -171,14 +172,17 @@ function verifyPayload(header, payload, aud) {
         return false;
     }
 
-    console.log("aud", payload.aud);
+    console.log("payload.aud", payload.aud);
 
     if (payload.aud === undefined) {
         console.error("aud missing");
         return false;
     } else if (Array.isArray(payload.aud)) {
         for (a in payload.aud) {
-          console.log("aud",a);
+          if (aud == a) {
+            console.log("found");
+          }
+          //console.log("aud",a);
         }
         if (!payload.aud.includes(aud)) {
             console.error("aud not in aud array");
