@@ -251,14 +251,11 @@ function verifyPayload(header, payload, aud) {
 
 function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
 
-    var nonce = sessionID;
-    var state = sessionID;
- 
     var sub_jwk  = acmeKey.toJWK(true);
     sub_jwk.use = "sig"
 
     var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: sub_jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
-    scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
+    scope:"openid profile", state: sessionID, nonce: sessionID, registration: registration, claims: claims};
     console.log("payload", payload);
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
         {
@@ -267,7 +264,8 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
             },
             expiresIn: "5m"
         }
-    );
+    )
+
     console.log(jwsCompact);
     var urlString =  "https://app.svipe.io/auth/" + jwsCompact; // technically we could use openid:// to support other apps
     console.log("URL ",urlString);
