@@ -87,6 +87,7 @@ app.get('/', (req, res) => {
 
 app.get('/callback', (req, res) => {
 
+    console.log("callback");
     var uuid = req.body.uuid;
     var statusOK = JSON.stringify({status:'OK'});
     var statusNOK = JSON.stringify({status:'NOK'});
@@ -113,7 +114,7 @@ app.get('/callback', (req, res) => {
 
       if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
-        console.log("msg",msg);
+        console.log("callback msg",msg);
         socket.emit("message", msg);
         delete clients[uuid];
         res.end(statusOK);
@@ -263,7 +264,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
 
     var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
     scope:"openid profile", state: state, nonce: nonce, registration: registration, claims: claims};
-    
+
     console.log("payload",payload);
     
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
