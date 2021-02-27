@@ -2,13 +2,9 @@
 
 An example of a node.js integration with Svipe iD.
 
-We request svipeid and full name
-New users are registered in sqlite DB
-Returning users are updated with last access and number of visits
-
-We sign a JWS using a dummy key (that must be registered with Svipe)
-
-A QR code is displayed
-
-Wait for a token over websocket
+- We request svipeid, given_name and family_name
+- We sign a JWS using a dummy key (that must be registered with Svipe)
+- A QR code is displayed
+- User signs with the Svipe App
+- Wait for a token to be posted and communicated to the browser over a websocket
 
