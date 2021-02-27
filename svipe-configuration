@@ -1,7 +1,0 @@
-{
-   "client_id":"https://acme.svipe.io/callback",
-   "registration": "https://acme.svipe.io/logo.png",
-   "name": "Acme", 
-   "privacy": "https://www.svipe.com/privacy/", 
-   "access": ["family_name","given_name","svipeid"],
-}
