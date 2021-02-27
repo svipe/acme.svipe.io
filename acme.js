@@ -177,6 +177,9 @@ function verifyPayload(header, payload, aud) {
         console.error("aud missing");
         return false;
     } else if (Array.isArray(payload.aud)) {
+        for a in payload.aud {
+          console.log("aud",a);
+        }
         if (!payload.aud.includes(aud)) {
             console.error("aud not in aud array");
             return false;
