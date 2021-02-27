@@ -90,7 +90,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/welcome/:jws', (req, res) => {
-  console.log(requests);
+  console.log(req);
   // hmm, need to verify again. in case the token was modfied in the browser
   var token = req.parameters["jws"];
   var parts = token.split('.');
