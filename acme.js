@@ -5,7 +5,9 @@ A simple example of how to sign a JWT with an Openid request.
 1. A websocket is established with a unique sesssion id
 2. The JWS is created and send to the handlebars in the form of a QR code
 3. When the user clicks Sign in the QR code is revealed.
-4. 
+4. User scans QR with App
+5. User decides what to share
+6. JWS is created and posted to client_id
 
 */
 
@@ -61,33 +63,35 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// ***********************************************************
+// These are the only parameters you need to provide
 var domain = "acme.svipe.io";
-// Change when going live
-var host = "https://"+domain;
-//var host = "http://localhost:"+port;
-
 const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
+var requests = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
+// ***********************************************************
+
+var host = "https://"+domain;
+//var host = "http://localhost:"+port; // For local dev
 
 //const acmeKey = jose.JWK.asKey("7c3de020a79770277387799c2f04bfd20f8528ab733b506c13ba0625794687ad");
 
 console.log(acmeKey.public);
 
 app.get('/', (req, res) => {
-    var claims = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
     console.log(claims);
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-    generateQRCode(sessionID, redirect_uri, aud, claims, logo).then(function(srcpic) {
-        res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: claims});
+    generateQRCode(sessionID, redirect_uri, aud, requests, logo).then(function(srcpic) {
+        res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests});
     });
 });
 
 app.post('/callback', (req, res) => {
-
     console.log("callback");
+
     var uuid = req.body.uuid;
     var statusOK = JSON.stringify({status:'OK'});
     var statusNOK = JSON.stringify({status:'NOK'});
@@ -95,7 +99,7 @@ app.post('/callback', (req, res) => {
     var socket = clients[uuid];
     if (socket != undefined || socket != null ) {
       console.log("Has client for ", uuid);
-      // now we need to verify stuff before forwarding...
+      // now we need to verify stuff before updating ...
       var token = req.body.jwt;
       var parts = token.split('.');
       
@@ -105,18 +109,18 @@ app.post('/callback', (req, res) => {
 
       var sub_jwk = payload.sub_jwk;
       var sub = payload.sub;
+      var isVerified = verifyPayload(header, payload, domain);
+
       console.log("sub_jwk", sub_jwk);
       console.log("sub", sub);
-      console.log("verify payload",verifyPayload(header, payload));
-      //console.log("verify signature", jws.verify(signature,sub_jwk));
-      // EC keys not supported....
-      var isVerified = verifyPayload(header, payload, domain);
+      console.log("verify payload",isVerified);
 
       if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
         console.log("callback msg",msg);
         socket.emit("message", msg);
         delete clients[uuid];
+        // This is where you could set a cookie. The browser could also to a redirect to a Welcome page or such.
         res.end(statusOK);
       } else {
         console.error("could not verify token");
@@ -127,51 +131,6 @@ app.post('/callback', (req, res) => {
     }
 
 })
-
-app.post('/', (req, res) => {
-
-    var uuid = req.body.uuid;
-    var statusOK = JSON.stringify({status:'OK'});
-    var statusNOK = JSON.stringify({status:'NOK'});
-  
-    var socket = clients[uuid];
-    if (socket != undefined || socket != null ) {
-      console.log("Has client for ", uuid);
-      // now we need to verify stuff before forwarding...
-      var token = req.body.jwt;
-      var parts = token.split('.');
-      
-      var header = JSON.parse(base64url.decode(parts[0]));
-      var payload = JSON.parse(base64url.decode(parts[1]));
-      var signature = base64url.decode(parts[2]);
-
-      var sub_jwk = payload.sub_jwk;
-      var sub = payload.sub;
-
-      console.log("sub_jwk", sub_jwk);
-      console.log("sub", sub);
-
-      console.log("verify payload",verifyPayload(header, payload));
-      //console.log("verify signature", jws.verify(signature,sub_jwk));
-      // EC keys not supported....
-
-      var isVerified = verifyPayload(header, payload);
-
-      if (isVerified) {
-        var msg = {op:'authdone', jwt: token, sub: sub};
-        console.log("msg",msg);
-        socket.emit("message", msg);
-        delete clients[uuid];
-        res.end(statusOK);
-      } else {
-        console.error("could not verify token");
-        res.end(statusNOK);
-      }
-    } else {
-      res.end(statusNOK);
-    }
-
-});
 
 // This must be relative to the client_id/redirect_uri
 
