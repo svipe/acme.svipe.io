@@ -87,7 +87,6 @@ app.get('/', (req, res) => {
     generateQRCode(sessionID, redirect_uri, aud, requests, logo).then(function(response) {
         var srcpic = response; //.srcpic;
         var jwsCompact = "response.jwsCompact";
-        requests.stringify = JSON.stringify(requests);
         console.log("requests", requests);
         res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests,jwsCompact:jwsCompact});
     });

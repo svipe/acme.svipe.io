@@ -77,7 +77,11 @@ portant;}
             <div id="signup">
                 <p>To sign in using your Svipe iD, please scan this code</p>
                 <!-- How to do this dynamically using handlebars? -->
-                <p>You will be asked to share: given name, family name and svipeid
+                <p>You will be asked to share: 
+                {{#each claims}}
+                {{@key}}
+                {{/each}}
+                </p>
                 <div id="qrcode"><img src={{{srcpic}}} width="50%"></div>
                 <div id="progress">
                     <p>Waiting for approval of the selective disclosure request</p>
