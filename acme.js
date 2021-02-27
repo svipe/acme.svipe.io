@@ -77,12 +77,6 @@ var host = "https://"+domain;
 
 console.log(acmeKey.public);
 
-var arr = [ 'https://acme.svipe.io/callback' ];
-
-for (v in arr) {
-  console.log(v);
-}
-
 app.get('/', (req, res) => {
     console.log(requests);
     var redirect_uri = host+"/callback"; 
@@ -184,16 +178,21 @@ function verifyPayload(header, payload, aud) {
         console.error("aud missing");
         return false;
     } else if (Array.isArray(payload.aud)) {
-        for (a in payload.aud) {
-          if (aud == a) {
-            console.log("found");
-          }
-          //console.log("aud",a);
-        }
+      /* did not work for some reason, so to it clumsily
         if (!payload.aud.includes(aud)) {
             console.error("aud not in aud array");
             return false;
+        }*/
+        var found = false;
+        for (i in payload.aud) {
+          if (aud == payload.aud[i]) {
+            found = true;
+          }
         }
+        if (!found) {
+          return false;
+        }
+        
     } else if (payload.aud === aud) {
         console.error("payload.aud is not equal to aud");
         return false;
