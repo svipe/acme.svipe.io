@@ -78,7 +78,7 @@ app.get('/', (req, res) => {
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
-    var aud = domain; 
+    var aud = redirect_uri; 
     console.log(sessionID);
     generateQRCode(sessionID, redirect_uri, aud, claims, logo).then(function(srcpic) {
         res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: claims});
