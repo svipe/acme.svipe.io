@@ -89,10 +89,10 @@ app.get('/', (req, res) => {
     });
 });
 
-app.get('/welcome/:jwt', (req, res) => {
+app.get('/welcome/:jws', (req, res) => {
   console.log(requests);
   // hmm, need to verify again. in case the token was modfied in the browser
-  var token = req.body.jwt;
+  var token = req.parameters["jws"];
   var parts = token.split('.');
   var header = JSON.parse(base64url.decode(parts[0]));
   var payload = JSON.parse(base64url.decode(parts[1]));

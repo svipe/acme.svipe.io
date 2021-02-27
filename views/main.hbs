@@ -93,15 +93,15 @@ function setupSocket() {
             console.log("progress");
             showProgress();
         } else if (msg.op == "authdone") {
-            var jwt = msg.jwt;
+            var jws = msg.jwt;
             var sub = msg.sub;
-            if (jwt != null) {
-                console.log("received jwt token", jwt);
+            if (jws != null) {
+                console.log("received jws token", jws);
                 socket.close();
                 // Now redirect 
-                window.location.href = "/welcome/"+jwt;
+                window.location.href = "/welcome/"+jws;
             } else {
-                console.error("No jwt token received");
+                console.error("No jws token received");
             }
         } else {
             console.error("Could not contact socket server")
