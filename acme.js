@@ -163,7 +163,6 @@ app.post('/callback', (req, res) => {
     } else {
       res.end(statusNOK);
     }
-
 })
 
 // This must be relative to the client_id/redirect_uri
