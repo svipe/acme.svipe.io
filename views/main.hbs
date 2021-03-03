@@ -63,7 +63,7 @@ portant;}
                     <img id="profile__logo__app-image" height=100  src="{{{logo}}}"></img>
                 </p>
             </div>
-            <div id = "signin">
+            <div id="signin">
                 <h3>
                 <div class="only-mobile">
                     <a href=https://app.svipe.com/auth/{{{jwsCompact}}}>Sign in with Svipe iD</a>
@@ -73,7 +73,6 @@ portant;}
                 </div>
                 </h3>
             </div>
-
             <div id="signup">
                 <p>To sign in using your Svipe iD, please scan this code</p>
                 <!-- How to do this dynamically using handlebars? -->
@@ -83,12 +82,12 @@ portant;}
                 {{/each}}
                 </p>
                 <div id="qrcode"><img src={{{srcpic}}} width="30%"></div>
-                <div id="progress">
+            </div>
+            <div id="progress">
                     <p>Waiting for approval of the selective disclosure request</p>
-                </div>
-                <div id="cancel">
+            </div>
+            <div id="cancel">
                 <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
-                </div>
             </div>
             <div id="promotion" class="modal-body text-center">
                 <p>If you do not have the app installed on your phone you can download it here.</p>
