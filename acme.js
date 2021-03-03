@@ -81,8 +81,8 @@ app.get('/', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-
-    generateQRCode(sessionID, redirect_uri, aud, requests, logo).then( function(response) {
+    
+    generateQRCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
         var srcpic = response; //.srcpic;
         var jwsCompact = "response.jwsCompact";
         console.log("requests", requests);
@@ -128,8 +128,7 @@ app.get('/welcome/:jws', (req, res) => {
     var aud = redirect_uri; 
     console.log(sessionID);
     var claims = { credential: {"acme": sessionID}};
-
-    generateQRCode(sessionID, redirect_uri, aud, claims, logo).then( function(response) {
+    generateQRCode("cred",path,sessionID, redirect_uri, aud, claims, logo).then( function(response) {
         var srcpic = response; //.srcpic;
         var jwsCompact = "response.jwsCompact";
         console.log("requests", requests);
@@ -262,7 +261,7 @@ function verifyPayload(header, payload, aud) {
     return true;
 }
 
-function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
+function generateQRCode(path,sessionID, redirect_uri, aud, claims, registration) {
 
     var sub_jwk  = acmeKey.toJWK(true);
     sub_jwk.use = "sig"
@@ -280,7 +279,7 @@ function generateQRCode(sessionID, redirect_uri, aud, claims, registration) {
     )
 
     console.log(jwsCompact);
-    var urlString =  "https://app.svipe.io/auth/" + jwsCompact; // technically we could use openid:// to support other apps
+    var urlString =  "https://app.svipe.io/"+ path + /" + jwsCompact; // technically we could use openid:// to support other apps
     console.log("URL ",urlString);
     var ret =  {srcpic: QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
     return ret.srcpic;
