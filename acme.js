@@ -81,12 +81,14 @@ app.get('/', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
+
     generateQRCode(sessionID, redirect_uri, aud, requests, logo).then( function(response) {
         var srcpic = response; //.srcpic;
         var jwsCompact = "response.jwsCompact";
         console.log("requests", requests);
         res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests,jwsCompact:jwsCompact});
     });
+
 });
 
 app.get('/welcome/:jws', (req, res) => {
@@ -118,7 +120,22 @@ app.get('/welcome/:jws', (req, res) => {
     if (family_name) {
       name += " " + family_name;
     }
-    res.render('welcome', {layout: 'index', logo: logo, name: name});
+    // create a membership credential
+
+    var redirect_uri = host+"/callback"; 
+    var logo = host + "/logo.png";
+    var sessionID = req.sessionID;
+    var aud = redirect_uri; 
+    console.log(sessionID);
+    var claims = { credential: {"acme": sessionID}};
+
+    generateQRCode(sessionID, redirect_uri, aud, claims, logo).then( function(response) {
+        var srcpic = response; //.srcpic;
+        var jwsCompact = "response.jwsCompact";
+        console.log("requests", requests);
+        res.render('welcome', {layout: 'index', logo: logo, name: name,srcpic: srcpic, claims});
+    });
+
   }
 })
 
