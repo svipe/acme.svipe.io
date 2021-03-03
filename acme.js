@@ -279,7 +279,7 @@ function generateQRCode(path,sessionID, redirect_uri, aud, claims, registration)
     )
 
     console.log(jwsCompact);
-    var urlString =  "https://app.svipe.io/"+ path + /" + jwsCompact; // technically we could use openid:// to support other apps
+    var urlString =  "https://app.svipe.io/"+ path + "/" + jwsCompact; // technically we could use openid:// to support other apps
     console.log("URL ",urlString);
     var ret =  {srcpic: QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
     return ret.srcpic;
