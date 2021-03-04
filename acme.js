@@ -18,12 +18,14 @@ const session = require('express-session');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+var request = require('request');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const cors = require('cors');
 var clients = {}; // Keep track of outstanding connections
 const base64url = require('base64url');
 const jose = require('jose');
+const { Session } = require('inspector');
 // need this?
 
 const {
@@ -264,6 +266,23 @@ function verifyPayload(header, payload, aud) {
     return true;
 }
 
+
+function shorten(data) {
+  return new Promise((resolve, reject) => {
+      request.post({
+        headers: {'content-type' : 'application/x-www-form-urlencoded'},
+        url:     "https://api.svipe.com/v1/shortenurl",
+        body:    data
+      }, (error, response, body) => {
+          if (error) reject(error);
+          if (response.statusCode != 200) {
+              reject('Invalid status code <' + response.statusCode + '>');
+          }
+          resolve(body);
+      });
+  });
+}
+
 async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registration) {
 
     var sub_jwk  = acmeKey.toJWK(true);
@@ -280,14 +299,19 @@ async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registr
             expiresIn: "5m"
         }
     )
-
     console.log(jwsCompact);
-    var urlString =  "https://app.svipe.io/"+ path + "/" + jwsCompact; // technically we could use openid:// to support other apps
-    console.log("URL ",urlString);
-    var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
-    return ret;
-    //return ret.srcpic;
-    //return {srcpic: QRCode.toDataURL(urlString), jwsCompact: jwsCompact} ;
+    
+    try {
+      var token = await shorten(jwsCompact);
+      var urlString = "https://app.svipe.io/auth/"+token;
+      console.log("token", token);
+      console.log("URL ",urlString);
+      var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
+      return ret;
+    } catch {
+      console.error("qr");
+    }
+    
 }
 
 io.on('connection', socket => {
