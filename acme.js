@@ -135,7 +135,7 @@ app.get('/welcome/:jws', (req, res) => {
   }
 })
 
-// This happens when using a mobile browser
+// This happens when using a mobile browser, so we bypass the socket in this case
 app.get('/callback/:jws', (req, res) => {
   var jws = req.params["jws"];
   console.log("callback", jws);
@@ -143,9 +143,7 @@ app.get('/callback/:jws', (req, res) => {
 })
 
 app.post('/callback', (req, res) => {
-
     console.log("callback");
-
     var uuid = req.body.uuid;
     var statusOK = JSON.stringify({status:'OK'});
     var statusNOK = JSON.stringify({status:'NOK'});
