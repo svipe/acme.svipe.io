@@ -126,7 +126,7 @@ app.get('/welcome/:jws', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-    var claims = { credential: {iss: "Acme", name: "Membership", id: sessionID}};
+    var claims = { credential: {iss: "Acme", name: "Membership", id: svipeid}};
     generateQRCode("cred",sessionID, redirect_uri, aud, claims, logo).then( function(response) {
         var srcpic = response; //.srcpic;
         var jwsCompact = "response.jwsCompact";
