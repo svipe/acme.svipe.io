@@ -127,8 +127,9 @@ app.get('/welcome/:jws', (req, res) => {
     var claims = { credential: {iss: "Acme", name: "Vaccination", id: svipeid}};
     generateQRCode("cred",sessionID, redirect_uri, aud, claims, logo).then( function(response) {
         var srcpic = response.srcpic;
+        var jwsCompact = response.jwsCompact;
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact:jwsCompact});
+        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact});
     });
 
   }
