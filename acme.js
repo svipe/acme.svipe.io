@@ -73,19 +73,17 @@ var requests = {"svipeid": {"essential":true}, "given_name":null, "family_name":
 var host = "https://"+domain;
 //var host = "http://localhost:"+port; // For local dev
 
-
 app.get('/', (req, res) => {
-   
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
     generateQRCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
-        var srcpic = response; //.srcpic;
-        var jwsCompact = "response.jwsCompact";
-        console.log("requests", requests);
-        res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests,jwsCompact:jwsCompact});
+      var srcpic = response.srcpic;
+      var jwsCompact = response.jwsCompact;
+      console.log("requests", requests);
+      res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
     });
 
 });
@@ -128,9 +126,9 @@ app.get('/welcome/:jws', (req, res) => {
     console.log(sessionID);
     var claims = { credential: {iss: "Acme", name: "Vaccination", id: svipeid}};
     generateQRCode("cred",sessionID, redirect_uri, aud, claims, logo).then( function(response) {
-        var srcpic = response;
+        var srcpic = response.srcpic;
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', logo: logo, name: name,srcpic: srcpic, claims});
+        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact:jwsCompact});
     });
 
   }
@@ -259,7 +257,7 @@ function verifyPayload(header, payload, aud) {
     return true;
 }
 
-function generateQRCode(path,sessionID, redirect_uri, aud, claims, registration) {
+async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registration) {
 
     var sub_jwk  = acmeKey.toJWK(true);
     sub_jwk.use = "sig"
@@ -279,8 +277,9 @@ function generateQRCode(path,sessionID, redirect_uri, aud, claims, registration)
     console.log(jwsCompact);
     var urlString =  "https://app.svipe.io/"+ path + "/" + jwsCompact; // technically we could use openid:// to support other apps
     console.log("URL ",urlString);
-    var ret =  {srcpic: QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
-    return ret.srcpic;
+    var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
+    return ret;
+    //return ret.srcpic;
     //return {srcpic: QRCode.toDataURL(urlString), jwsCompact: jwsCompact} ;
 }
 

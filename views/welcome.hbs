@@ -30,8 +30,13 @@
             <div id = "welcome">
                 Welcome {{{name}}}
             </div>
-            <p>To pickup your Vaccination Badge, scan this code:</p>
-            <div id="qrcode"><img src={{{srcpic}}} width="30%"></div>
+            <div class="only-mobile">
+                <a href=https://app.svipe.com/cred/{{{jwsCompact}}}>Pick up Vaccination Badge</a>
+            </div>
+            <div class="only-desktop">            
+                <p>To pickup your Vaccination Badge, scan this code:</p>
+                <div id="qrcode"><img src={{{srcpic}}} width="30%"></div>
+            </div>
         </div>
 </body>
 </html>
