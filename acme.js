@@ -135,7 +135,15 @@ app.get('/welcome/:jws', (req, res) => {
   }
 })
 
+// This happens when using a mobile browser
+app.get('/callback/:jws', (req, res) => {
+  var jws = req.params["jws"];
+  console.log("callback", jws);
+  res.redirect("/welcome/"+jws);
+})
+
 app.post('/callback', (req, res) => {
+
     console.log("callback");
 
     var uuid = req.body.uuid;
