@@ -70,6 +70,9 @@ app.use(bodyParser.json());
 var domain = "acme.svipe.io";
 const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
 var requests = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
+var requests2 = { credential: {iss: "Acme", name: "Vaccination", type: "Covid"}};
+// iss: null means any issuer, the same for the other attributes
+// 
 // ***********************************************************
 
 var host = "https://"+domain;
@@ -81,7 +84,7 @@ app.get('/', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-    generateQRCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
+    generateQRCode("auth",sessionID, redirect_uri, aud, requests, requests2, logo).then( function(response) {
       var srcpic = response.srcpic;
       var jwsCompact = response.jwsCompact;
       console.log("requests", requests);
@@ -126,12 +129,14 @@ app.get('/welcome/:jws', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-    var claims = { credential: {iss: "Acme", name: "Vaccination", id: svipeid}};
-    generateQRCode("cred",sessionID, redirect_uri, aud, claims, logo).then( function(response) {
+    var claims = { credential: {iss: "Acme", name: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
+    generateQRCode("cred",sessionID, redirect_uri, aud, claims, requests2, logo).then( function(response) {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
+        var srcpic2 = response.srcpic2;
+        var jwsCompact2 = response.jwsCompact2;
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic, jwsCompact2: jwsCompact});
+        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2});
     });
 
   }
@@ -283,7 +288,7 @@ function shorten(data) {
   });
 }
 
-async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registration) {
+async function generateQRCode(path,sessionID, redirect_uri, aud, claims, claims2, registration) {
 
     var sub_jwk  = acmeKey.toJWK(true);
     sub_jwk.use = "sig"
@@ -291,6 +296,12 @@ async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registr
     var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: sub_jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
     scope:"openid profile", state: sessionID, nonce: sessionID, registration: registration, claims: claims};
     console.log("payload", payload);
+
+    var payload2 = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: sub_jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
+    scope:"openid profile", state: sessionID, nonce: sessionID, registration: registration, claims: claims2};
+    console.log("payload", payload);
+
+
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
         {
             header: {
@@ -299,13 +310,29 @@ async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registr
             expiresIn: "5m"
         }
     )
+
+    var jwsCompact2 = jose.JWT.sign(payload2, acmeKey, 
+      {
+          header: {
+              kid: sub_jwk.kid
+           },
+          expiresIn: "5m"
+      }
+    )
     console.log(jwsCompact);
+    console.log(jwsCompact2);
+
     try {
       var token = await shorten(jwsCompact);
-      var urlString = "https://app.svipe.io/auth/"+token;
+      var urlString = "https://app.svipe.io/"+path+"/"+token;
       console.log("token", token);
       console.log("URL ",urlString);
-      var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
+
+      var token2 = await shorten(jwsCompact);
+      var urlString2 = "https://app.svipe.io/auth/"+token;
+      console.log("token2", token2);
+      console.log("URL ",urlString2);
+      var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact,srcpic2: await QRCode.toDataURL(urlString2), jwsCompact2: jwsCompact2};
       return ret;
     } catch { // Display a friendly error page
       console.error("qr");
