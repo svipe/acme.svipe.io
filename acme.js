@@ -346,7 +346,7 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
 }
 
 
-async function generateSigninCode(path,sessionID, redirect_uri, aud, claims, claims2, registration) {
+async function generateSigninCode(path,sessionID, redirect_uri, aud, claims, registration) {
 
   var sub_jwk  = acmeKey.toJWK(true);
   sub_jwk.use = "sig"
