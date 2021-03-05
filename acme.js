@@ -131,7 +131,7 @@ app.get('/welcome/:jws', (req, res) => {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact});
+        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic, jwsCompact2: jwsCompact});
     });
 
   }
@@ -167,7 +167,7 @@ app.post('/callback', (req, res) => {
 
       console.log("sub_jwk", sub_jwk);
       console.log("sub", sub);
-      console.log("verify payload",isVerified);
+      console.log("verify payload", isVerified);
 
       if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
@@ -300,7 +300,6 @@ async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registr
         }
     )
     console.log(jwsCompact);
-    
     try {
       var token = await shorten(jwsCompact);
       var urlString = "https://app.svipe.io/auth/"+token;
@@ -308,7 +307,7 @@ async function generateQRCode(path,sessionID, redirect_uri, aud, claims, registr
       console.log("URL ",urlString);
       var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
       return ret;
-    } catch {
+    } catch { // Display a friendly error page
       console.error("qr");
     }
     
