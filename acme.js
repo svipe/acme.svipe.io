@@ -67,10 +67,11 @@ app.use(bodyParser.json());
 
 // ***********************************************************
 // These are the only parameters you need to provide
+
 var domain = "acme.svipe.io";
 const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
 var requests = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
-var requests2 = { credential: {iss: "Acme", name: "Vaccination", type: "Covid", id: null}};
+var requests2 = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: null}}; // id could f.i be a certain batch
 
 // iss: null means any issuer, the same for the other attributes
 // 
@@ -136,12 +137,8 @@ app.get('/welcome/:jws', (req, res) => {
         var jwsCompact = response.jwsCompact;
         var srcpic2 = response.srcpic2;
         var jwsCompact2 = response.jwsCompact2;
-
-        var srcpic3 = response.srcpic2;
-        var jwsCompact3 = response.jwsCompact2;
-
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2, srcpic3: srcpic3, jwsCompact3: jwsCompact3});
+        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2});
     });
 
   }
