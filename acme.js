@@ -323,7 +323,7 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
             expiresIn: "5m"
         }
     )
-
+    console.log("sessionID",sessionID);
     tokens[sessionID] = jwsCompact;
 
     var jwsCompact2 = jose.JWT.sign(payload2, acmeKey, 
@@ -338,7 +338,6 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
     console.log(jwsCompact2);
 
     try {
-
       var token = await shorten(jwsCompact);
       var urlString = "https://app.svipe.io/"+path+"/"+token;
       console.log("token", token);
