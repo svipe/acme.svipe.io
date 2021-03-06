@@ -152,7 +152,7 @@ app.get('/callback/:jws', (req, res) => {
   res.redirect("/welcome/"+jws);
 })
 
-app.get('/token/:uuid', (req, res) => {
+app.get('/callback/token/:uuid', (req, res) => {
   var uuid = req.params["uuid"];
   console.log("token", uuid);
   var token = tokens[uuid];
