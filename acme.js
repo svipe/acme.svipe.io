@@ -179,14 +179,7 @@ app.post('/callback', (req, res) => {
       var token = req.body.jwt;
       var parts = token.split('.');
       
-      var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
-      var logo = host + "/logo.png";
-      var redirect_uri = host+"/callback"; 
-      var aud = redirect_uri; 
-      memberBadge("cred",uuid, redirect_uri, aud, claims, logo).then( function(response) {
-          var jwsCompact = response.jwsCompact;
-          tokens[uuid] = jwsCompact;
-      });
+      
   
       var header = JSON.parse(base64url.decode(parts[0]));
       var payload = JSON.parse(base64url.decode(parts[1]));
@@ -200,10 +193,20 @@ app.post('/callback', (req, res) => {
       console.log("sub", sub);
       console.log("verify payload", isVerified);
 
+
       if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
         console.log("callback msg",msg);
         socket.emit("message", msg);
+        var svipeid = payload.claims.svipeid;
+        var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
+        var logo = host + "/logo.png";
+        var redirect_uri = host+"/callback"; 
+        var aud = redirect_uri; 
+        memberBadge("cred",uuid, redirect_uri, aud, claims, logo).then( function(response) {
+          var jwsCompact = response.jwsCompact;
+          tokens[uuid] = jwsCompact;
+        });
         // This is where you could set a cookie. 
         // The browser will redirect to the Welcome page specified by redirect_uri.
         res.end(statusOK);
