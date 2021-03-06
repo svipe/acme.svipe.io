@@ -128,21 +128,27 @@ app.get('/welcome/:jws', (req, res) => {
     if (family_name) {
       name += " " + family_name;
     }
-
+    
+    var credential = payload.claims["credential"];
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
-    var sessionID = req.sessionID;
-    var aud = redirect_uri; 
-    var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
-    generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2, logo).then( function(response) {
+
+    if (credential != null) {
+      var badge = JSON.stringify(credential);
+      res.render('members', {layout: 'index', logo: logo, badge: badge});
+    } else {
+      var sessionID = req.sessionID;
+      var aud = redirect_uri; 
+      var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
+      generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2, logo).then( function(response) {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
         var srcpic2 = response.srcpic2;
         var jwsCompact2 = response.jwsCompact2;
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', sessionID: sessionID, logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2});
-    });
-
+        res.render('welcome', {layout: 'index', credential: credential,sessionID: sessionID, logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2});
+      });
+    }
   }
 })
 
