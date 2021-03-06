@@ -71,8 +71,11 @@ app.use(bodyParser.json());
 
 var domain = "acme.svipe.io";
 const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
-var requests = {"svipeid": {"essential":true}, "given_name":null, "family_name":null};
-var requests2 = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: null}}; // id could f.i be a certain batch
+
+var credential =  {iss: "Acme", name: "Covid19", type: "Vaccination", id: null}
+var requests2 = { credential: credential}; // id could f.i be a certain batch
+
+var requests = {svipeid: {essential:true}, given_name:null, family_name: null, credential: credential};
 
 // iss: null means any issuer, the same for the other attributes
 // 
