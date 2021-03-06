@@ -324,7 +324,7 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
         }
     )
 
-    tokens[uuid] = jwsCompact;
+    tokens[sessionID] = jwsCompact;
 
     var jwsCompact2 = jose.JWT.sign(payload2, acmeKey, 
       {
