@@ -345,7 +345,7 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
       console.log("URL ", urlString);
 
       var token2 = await shorten(jwsCompact2);
-      var urlString2 = "https://app.svipe.io/auth/"+token;
+      var urlString2 = "https://app.svipe.io/auth/"+token2;
       console.log("token2", token2);
       console.log("URL ", urlString2);
 
