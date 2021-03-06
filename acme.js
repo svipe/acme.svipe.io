@@ -159,9 +159,9 @@ app.get('/callback/token/:uuid', (req, res) => {
   if (token != undefined || token != null ) {
     console.log("found badge token");
     res.send(token);
-    delete tokens[uuid]; // can only be picked up once
+    //delete tokens[uuid]; // can only be picked up once
   } else {
-    console.error("could not find token in", tokens);
+    console.error("could not find token for ",uuid," in ", tokens);
     res.send("already used");
   }
 })
