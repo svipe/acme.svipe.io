@@ -125,13 +125,11 @@ app.get('/welcome/:jws', (req, res) => {
     if (family_name) {
       name += " " + family_name;
     }
-    // create a membership credential
 
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
-    console.log(sessionID);
     var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
     generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2, logo).then( function(response) {
         var srcpic = response.srcpic;
@@ -139,9 +137,24 @@ app.get('/welcome/:jws', (req, res) => {
         var srcpic2 = response.srcpic2;
         var jwsCompact2 = response.jwsCompact2;
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2});
+        res.render('welcome', {layout: 'index', sessionID: sessionID, logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2});
     });
 
+  }
+})
+
+app.get('/members/:jws', (req, res) => {
+  // hmm, need to verify again. in case the token was modfied in the browser
+  var token = req.params["jws"];
+  if (token != null) {
+    console.log("token", token);
+    var parts = token.split('.');
+    var header = JSON.parse(base64url.decode(parts[0]));
+    var payload = JSON.parse(base64url.decode(parts[1]));
+    var isVerified = verifyPayload(header, payload, domain);
+    var logo = host + "/logo.png";
+    var badge = payload.claims["credential"];
+    res.render('members', {layout: 'index', logo: logo, badge: badge});
   }
 })
 
@@ -150,6 +163,12 @@ app.get('/callback/:jws', (req, res) => {
   var jws = req.params["jws"];
   console.log("callback", jws);
   res.redirect("/welcome/"+jws);
+})
+
+app.get('/callback2/:jws', (req, res) => {
+  var jws = req.params["jws"];
+  console.log("callback", jws);
+  res.redirect("/members/"+jws);
 })
 
 app.get('/callback/token/:uuid', (req, res) => {
@@ -179,8 +198,6 @@ app.post('/callback', (req, res) => {
       var token = req.body.jwt;
       var parts = token.split('.');
       
-      
-  
       var header = JSON.parse(base64url.decode(parts[0]));
       var payload = JSON.parse(base64url.decode(parts[1]));
       var signature = base64url.decode(parts[2]);
@@ -218,6 +235,7 @@ app.post('/callback', (req, res) => {
       res.end(statusNOK);
     }
 })
+
 
 // This must be relative to the client_id/redirect_uri
 

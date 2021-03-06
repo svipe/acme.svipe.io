@@ -88,4 +88,61 @@ portant;}
 </html>
 
 <script type="text/javascript">
+
+var redirect_uri = "{{{redirect_uri}}}";
+
+
+$(document).ready(function() {
+  setupSocket();
+  $("#signup").hide();
+  $("#cancel").hide();
+  $("#progress").hide();
+});
+
+function showQR() {
+    $("#signin").hide();
+    $("#signup").show();
+    $("#cancel").show();
+}
+
+function showProgress() {
+    $("#signup").hide();
+    $("#promotion").hide();
+    $("#cancel").show();
+    $("#progress").show();
+}
+
+function setupSocket() {
+
+    const socket = io('https://acme.svipe.io');
+    //const socket = io('http://localhost:4567');
+    if (socket == null ) {
+        console.error("Socket could not be opened");
+        return;
+    }
+    var helloMsg = {op: 'hello', uuid: '{{{sessionID}}}' };
+    socket.emit("message", helloMsg);
+    socket.on("message", function(msg) {
+        console.log("received ",msg);
+        if (msg.op == "hello") {
+            console.log("socket established");
+        } else if (msg.op == "progress") {
+            console.log("progress");
+            showProgress();
+        } else if (msg.op == "authdone") {
+            var jws = msg.jwt;
+            var sub = msg.sub;
+            if (jws != null) {
+                console.log("received jws token", jws);
+                socket.close();
+                // Now redirect 
+                window.location.href = "/members/"+jws;
+            } else {
+                console.error("No jws token received");
+            }
+        } else {
+            console.error("Could not contact socket server")
+        }
+    });   
+}
 </script>
