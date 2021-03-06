@@ -175,7 +175,6 @@ app.post('/callback', (req, res) => {
       console.log("Has client for ", uuid);
       // now we need to verify stuff before updating ...
       var token = req.body.jwt;
-      tokens[uuid] = token;
       var parts = token.split('.');
       
       var header = JSON.parse(base64url.decode(parts[0]));
@@ -324,6 +323,8 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
             expiresIn: "5m"
         }
     )
+
+    tokens[uuid] = jwsCompact;
 
     var jwsCompact2 = jose.JWT.sign(payload2, acmeKey, 
       {
