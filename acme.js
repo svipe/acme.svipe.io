@@ -154,13 +154,15 @@ app.get('/callback/:jws', (req, res) => {
 
 app.get('/callback/token/:uuid', (req, res) => {
   var uuid = req.params["uuid"];
-  console.log("token", uuid);
+  console.log("uuid", uuid);
   var token = tokens[uuid];
   if (token != undefined || token != null ) {
+    console.log("found badge token");
     res.send(token);
     delete tokens[uuid]; // can only be picked up once
   } else {
-    res.send(null);
+    console.error("could not fid token");
+    res.send("already used");
   }
 })
 
