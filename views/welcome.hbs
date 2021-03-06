@@ -65,14 +65,18 @@ portant;}
                 Welcome {{{name}}}
             </div>
             <div class="only-mobile">
+                <p>
                 <a href=https://app.svipe.com/cred/{{{jwsCompact}}}?mobile=1>Pick up Vaccination Badge</a>
+                </p>
             </div>
             <div class="only-desktop">            
                 <p>To pickup your Vaccination Badge, scan this code:</p>
                 <div id="qrcode"><img src={{{srcpic}}} width="30%"></div>
             </div>
             <div class="only-mobile">
-                <a href=https://app.svipe.com/cred/{{{jwsCompact2}}}?mobile=1>If you already have your vaccination badge go to members area</a>
+                <p>
+                <a href=https://app.svipe.com/auth/{{{jwsCompact2}}}?mobile=1>If you already have your vaccination badge go to members area</a>
+                </p>
             </div>
             <div class="only-desktop">            
                 <p>If you already have your vaccination badge, scan this code to go to members area :</p>
