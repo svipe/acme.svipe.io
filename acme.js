@@ -23,6 +23,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const cors = require('cors');
 var clients = {}; // Keep track of outstanding connections
+var tokens = {}; // Outstanding membership tokens that the client might pickup
 const base64url = require('base64url');
 const jose = require('jose');
 const { Session } = require('inspector');
@@ -131,7 +132,7 @@ app.get('/welcome/:jws', (req, res) => {
     var sessionID = req.sessionID;
     var aud = redirect_uri; 
     console.log(sessionID);
-    var claims = { credential: {iss: "Acme", name: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
+    var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
     generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2, logo).then( function(response) {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
@@ -151,6 +152,18 @@ app.get('/callback/:jws', (req, res) => {
   res.redirect("/welcome/"+jws);
 })
 
+app.get('/token/:uuid', (req, res) => {
+  var uuid = req.params["uuid"];
+  console.log("token", uuid);
+  var token = tokens[uuid];
+  if (token != undefined || token != null ) {
+    res.send(token);
+    delete tokens[uuid]; // can only be picked up once
+  } else {
+    res.send(null);
+  }
+})
+
 app.post('/callback', (req, res) => {
     console.log("callback");
     var uuid = req.body.uuid;
@@ -162,6 +175,7 @@ app.post('/callback', (req, res) => {
       console.log("Has client for ", uuid);
       // now we need to verify stuff before updating ...
       var token = req.body.jwt;
+      tokens[uuid] = token;
       var parts = token.split('.');
       
       var header = JSON.parse(base64url.decode(parts[0]));
@@ -180,7 +194,6 @@ app.post('/callback', (req, res) => {
         var msg = {op:'authdone', jwt: token, sub: sub};
         console.log("callback msg",msg);
         socket.emit("message", msg);
-        delete clients[uuid];
         // This is where you could set a cookie. 
         // The browser will redirect to the Welcome page specified by redirect_uri.
         res.end(statusOK);
