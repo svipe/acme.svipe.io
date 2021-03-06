@@ -179,6 +179,15 @@ app.post('/callback', (req, res) => {
       var token = req.body.jwt;
       var parts = token.split('.');
       
+      var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
+      var logo = host + "/logo.png";
+      var redirect_uri = host+"/callback"; 
+      var aud = redirect_uri; 
+      memberBadge("cred",uuid, redirect_uri, aud, claims, logo).then( function(response) {
+          var jwsCompact = response.jwsCompact;
+          tokens[uuid] = jwsCompact;
+      });
+  
       var header = JSON.parse(base64url.decode(parts[0]));
       var payload = JSON.parse(base64url.decode(parts[1]));
       var signature = base64url.decode(parts[2]);
@@ -302,6 +311,39 @@ function shorten(data) {
           resolve(body);
       });
   });
+}
+
+
+async function memberBadge(path,sessionID, redirect_uri, aud, claims, registration) {
+
+  var sub_jwk  = acmeKey.toJWK(true);
+  sub_jwk.use = "sig"
+
+  var payload = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: sub_jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
+  scope:"openid profile", state: sessionID, nonce: sessionID, registration: registration, claims: claims};
+  console.log("payload", payload);
+
+  var jwsCompact = jose.JWT.sign(payload, acmeKey, 
+      {
+          header: {
+              kid: sub_jwk.kid
+          },
+          expiresIn: "5m"
+      }
+  )
+  console.log(jwsCompact);
+  
+  try {
+    var token = await shorten(jwsCompact);
+    var urlString = "https://app.svipe.io/"+path+"/"+token;
+    console.log("token", token);
+    console.log("URL ", urlString);
+    var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact};
+    return ret;
+  } catch { // Display a friendly error page
+    console.error("qr");
+  }
+  
 }
 
 async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, claims2, registration) {
