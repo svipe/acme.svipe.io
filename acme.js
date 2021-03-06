@@ -161,7 +161,7 @@ app.get('/callback/token/:uuid', (req, res) => {
     res.send(token);
     delete tokens[uuid]; // can only be picked up once
   } else {
-    console.error("could not fid token");
+    console.error("could not find token in", tokens);
     res.send("already used");
   }
 })
