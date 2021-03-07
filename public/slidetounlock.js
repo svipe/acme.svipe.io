@@ -4,7 +4,7 @@ $(function() {
 		axis: 'x',
 		containment: 'parent',
 		drag: function(event, ui) {
-			if (ui.position.left > 550) {
+			if (ui.position.left > 400) {
 				$("#well").fadeOut();
 			} else {
 			    // Apparently Safari isn't allowing partial opacity on text with background clip? Not sure.
@@ -12,11 +12,16 @@ $(function() {
 			}
 		},
 		stop: function(event, ui) {
-			if (ui.position.left < 551) {
+			if (ui.position.left < 80) {
 				$(this).animate({
-					left: 0
+					left: -50
+				})
+			} else if (ui.position.left > 80) {
+				$(this).animate({
+					left: 90
 				})
 			}
+
 		}
 	});
 	
