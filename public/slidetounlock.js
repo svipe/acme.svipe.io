@@ -1,5 +1,4 @@
 $(function() {
-
 	$("#slider").draggable({
 		axis: 'x',
 		containment: 'parent',
@@ -21,7 +20,6 @@ $(function() {
 					left: 90
 				})
 			}
-
 		}
 	});
 	
