@@ -143,7 +143,8 @@ app.get('/welcome/:jws', (req, res) => {
     } else {
       var sessionID = req.sessionID;
       var aud = redirect_uri; 
-      var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
+      var serial_number = 1;
+      var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: serial_number, svipeid: svipeid}}; // This is what is issued. The client will only add if svipeid matches
       generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2, logo).then( function(response) {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
