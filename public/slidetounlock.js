@@ -12,11 +12,11 @@ $(function() {
 			}
 		},
 		stop: function(event, ui) {
-			if (ui.position.left < 80) {
+			if (ui.position.left < 60) {
 				$(this).animate({
 					left: -50
 				})
-			} else if (ui.position.left > 80) {
+			} else if (ui.position.left > 60) {
 				$(this).animate({
 					left: 90
 				})
