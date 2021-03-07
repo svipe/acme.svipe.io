@@ -75,7 +75,7 @@ const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
 var credential =  {iss: "Acme", name: "Covid19", type: "Vaccination", id: null}
 var requests2 = { credential: credential}; // id could f.i be a certain batch
 
-var requests = {svipeid: {essential:true}, given_name:null, family_name: null, credential: credential};
+var requests = {svipeid: {essential:true}, given_name:null, family_name: null};
 
 // iss: null means any issuer, the same for the other attributes
 // 
@@ -128,7 +128,7 @@ app.get('/welcome/:jws', (req, res) => {
     if (family_name) {
       name += " " + family_name;
     }
-    
+
     var credential = payload.claims["credential"];
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
