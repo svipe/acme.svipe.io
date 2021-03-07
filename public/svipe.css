@@ -52,8 +52,8 @@ body {
   -webkit-text-size-adjust: none;
 }
 #slider {
-	background: url(arrow.png) no-repeat;
-	width: 146px;
+	background: url(sviper.png) no-repeat;
+	width: 274px;
 	height: 98px;
 	display: inline-block;
 	vertical-align: middle;
