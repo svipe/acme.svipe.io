@@ -84,6 +84,10 @@ var requests = {svipeid: {essential:true}, given_name:null, family_name: null};
 var host = "https://"+domain;
 //var host = "http://localhost:"+port; // For local dev
 
+app.get('/svipe', (req, res) => {
+  res.render('svipe', {layout: 'index'});
+});
+
 app.get('/', (req, res) => {
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
@@ -218,7 +222,6 @@ app.post('/callback', (req, res) => {
       console.log("sub_jwk", sub_jwk);
       console.log("sub", sub);
       console.log("verify payload", isVerified);
-
 
       if (isVerified) {
         var msg = {op:'authdone', jwt: token, sub: sub};
