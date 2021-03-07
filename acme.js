@@ -166,7 +166,7 @@ app.get('/members/:jws', (req, res) => {
     var payload = JSON.parse(base64url.decode(parts[1]));
     var isVerified = verifyPayload(header, payload, domain);
     var logo = host + "/logo.png";
-    var badge = JSON.stringify(payload.claims["credential"]);
+    var badge = JSON.stringify(payload.claims["credential"], null, 2);
     res.render('members', {layout: 'index', logo: logo, badge: badge});
   }
 })

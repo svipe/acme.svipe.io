@@ -4,7 +4,8 @@ $(function() {
 		containment: 'parent',
 		drag: function(event, ui) {
 			if (ui.position.left > 400) {
-				$("#well").fadeOut();
+				//$("#well").fadeOut();
+				left: 90;
 			} else {
 			    // Apparently Safari isn't allowing partial opacity on text with background clip? Not sure.
 				// $("h2 span").css("opacity", 100 - (ui.position.left / 5))
@@ -31,8 +32,9 @@ $(function() {
 	    var touch = event.touches[0];
 	    curX = touch.pageX - this.offsetLeft - 73;
 	    if(curX <= 0) return;
-	    if(curX > 550){
-	    	$('#well').fadeOut();
+	    if(curX > 400){
+			return;
+	    	//$('#well').fadeOut();
 	    }
 	   	el.style.webkitTransform = 'translateX(' + curX + 'px)'; 
 	}, false);
