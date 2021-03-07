@@ -4,15 +4,12 @@
 	 http://css-tricks.com
 */
 
-* { margin: 0; padding: 0; }
-html { background: black; }
-
 
 #well {
 	padding: 0px 0px 0px 0px;
-	-webkit-border-radius: 30px;
-	-moz-border-radius: 30px;
-	border-radius: 30px;
+	-webkit-border-radius: 60px;
+	-moz-border-radius: 60px;
+	border-radius: 60px;
 	background: -moz-linear-gradient(top, #dddddd, #dddddd);
 	background: -webkit-gradient(linear,left top,left bottom,color-stop(0, #dddddd),color-stop(1, #dddddd));
 	overflow: hidden; 
@@ -35,8 +32,9 @@ html { background: black; }
   font-size: 50px;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   font-weight: 300;
-  padding: 0;
+  padding:  0px 0px 0px 0px;
   width: 100%;
+  height: 98px;
   -webkit-text-size-adjust: none;
 }
 #slider {
