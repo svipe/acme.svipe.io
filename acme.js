@@ -171,8 +171,7 @@ app.get('/welcome/:jws', (req, res) => {
       var fileURL = "https://www.lipsum.com/privacy.pdf"; 
       var signature_request = {data: fileURL, hash:"6c6636849aeb86eb0213f040baaceb3c4b614da4a5fe6da51656a63a13224d6f"};
       console.log("signature_request",signature_request);
-      var requests3 = {signature_request: signature_request, svipeid: {essential:true}, given_name:null, family_name: null};
-
+      var requests3 = {signature_request: signature_request, svipeid: {essential:true}};
       generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2,requests3, logo).then( function(response) {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
@@ -187,8 +186,6 @@ app.get('/welcome/:jws', (req, res) => {
           srcpic3: srcpic3, jwsCompact3: jwsCompact3
         });
       });
-
-
     }
   }
 })
@@ -204,8 +201,9 @@ app.get('/members/:jws', (req, res) => {
     var isVerified = verifyPayload(header, payload, domain);
     var logo = host + "/logo.png";
     var badge = JSON.stringify(payload.claims["credential"], null, 2);
+    var signature = JSON.stringify(payload.claims["signature_request"], null, 2);
     console.log("badge",badge);
-    res.render('members', {layout: 'index', logo: logo, badge: badge});
+    res.render('members', {layout: 'index', logo: logo, badge: badge, signature: signature});
   }
 })
 
