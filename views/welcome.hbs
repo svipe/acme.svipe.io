@@ -61,26 +61,70 @@ portant;}
                     <img id="profile__logo__app-image" height=100  src="{{{logo}}}"></img>
                 </p>
             </div>
-            <div id = "welcome">
-                Welcome {{{name}}}
+            <div id="welcome">
+                <h3>Welcome {{{name}}}</h3>
             </div>
             <div class="only-mobile">
                 <p>
                 <a href=https://app.svipe.com/cred/{{{jwsCompact}}}?mobile=1>Pick up Vaccination Badge</a>
                 </p>
             </div>
-            <div class="only-desktop">            
-                <p>To pickup your Vaccination Badge, scan this code:</p>
-                <div id="qrcode"><img src={{{srcpic}}} width="30%"></div>
+            <div class="only-desktop">
+                <div id="pickup"> 
+                    <h3>          
+                        <p><a href="javascript:showPickupQR()">Pickup Vaccination Badge</a></p>
+                    </h3>
+                </div>
+                <div id="badge">
+                     <p>To pickup your Vaccination Badge, scan this code:</p>
+                    <div id="pickupqrcode"><img src={{{srcpic}}} width="30%">
+                        <div id="cancelpickup">
+                            <button onClick="javascript:cancelPickup();">Cancel</button>
+                        </div>
+                    </div>
+                </div>            
             </div>
             <div class="only-mobile">
                 <p>
-                <a href=https://app.svipe.com/auth/{{{jwsCompact2}}}?mobile=1>If you already have your vaccination badge go to members area</a>
+                <a href=https://app.svipe.com/auth/{{{jwsCompact2}}}?mobile=1>Go to members only</a>
                 </p>
             </div>
-            <div class="only-desktop">            
-                <p>If you already have your vaccination badge, scan this code to go to members area :</p>
-                <div id="qrcode"><img src={{{srcpic2}}} width="30%"></div>
+            <div class="only-desktop">
+                <div id="members-only"> 
+                    <h3>          
+                        <p><a href="javascript:showMembersQR()">Go to members only area</a></p>
+                    </h3>
+                </div>
+                <div id="members">
+                     <p>To go to memers only, scan this code:</p>
+                    <div id="membersqrcode"><img src={{{srcpic}}} width="30%">
+                        <div id="cancelmembers">
+                            <button onClick="javascript:cancelMembers();">Cancel</button>
+                        </div>
+                    </div>
+                </div>            
+            </div>
+
+            <div> 
+                <div class="only-mobile">
+                    <p>
+                        <a href=https://app.svipe.com/auth/{{{jwsCompact}}}?mobile=1>Sign a contract with us</a>
+                    </p>
+                </div>
+                <div class="only-desktop">
+                    <div id=signcontract>
+                    <h3>          
+                        <p><a href="javascript:showContractQR()">Sign a contract with us</a></p>
+                    </h3>
+                    </div>
+                    <div id="contract" >      
+                    <p>To review and sign in the Svipe iD App, scan this code:</p>
+                    <div id="contractqrcode"><img src={{{srcpic}}} width="30%"></div>
+                        <div id="cancelcontract">
+                            <button onClick="javascript:cancelContract();">Cancel</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -88,21 +132,52 @@ portant;}
 </html>
 
 <script type="text/javascript">
-
 var redirect_uri = "{{{redirect_uri}}}";
-
-
 $(document).ready(function() {
   setupSocket();
+  $("#contract").hide();
   $("#signup").hide();
+  $("#badge").hide();
+  $("#members").hide();
   $("#cancel").hide();
   $("#progress").hide();
 });
 
-function showQR() {
-    $("#signin").hide();
-    $("#signup").show();
-    $("#cancel").show();
+function showPickupQR() {
+    $("#pickup").hide();
+    $("#badge").show();
+    $("#cancelpickup").show();
+}
+
+function cancelPickup() {
+    $("#pickup").show();
+    $("#badge").hide();
+    $("#cancelpickup").hide();
+}
+
+
+function showMembersQR() {
+    $("#members-only").hide();
+    $("#members").show();
+    $("#cancelmembers").show();
+}
+
+function cancelMembers() {
+    $("#members-only").show();
+    $("#members").hide();
+    $("#cancelmembers").hide();
+}
+
+function showContractQR() {
+    $("#signcontract").hide();
+    $("#contract").show();
+    $("#cancelcontract").show();
+}
+
+function cancelContract() {
+    $("#signcontract").show();
+    $("#contract").hide();
+    $("#cancelcontract").hide();
 }
 
 function showProgress() {

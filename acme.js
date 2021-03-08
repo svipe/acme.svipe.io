@@ -100,7 +100,26 @@ app.get('/', (req, res) => {
       console.log("requests", requests);
       res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
     });
+});
 
+// Demo how to sign a contract
+
+app.get('/sign', (req, res) => {
+  var redirect_uri = host+"/callback"; 
+  var logo = host + "/logo.png";
+  var sessionID = req.sessionID;
+  var aud = redirect_uri; 
+  console.log(sessionID);
+
+  var signature_request = "https://www.lipsum.com/privacy.pdf"
+  var requests = {svipeid: {essential:true}, given_name:null, family_name: null, signature_request: signature_request};
+
+  generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
+    var srcpic = response.srcpic;
+    var jwsCompact = response.jwsCompact;
+    console.log("requests", requests);
+    res.render('sign', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact, signature_request:signature_request});
+  });
 });
 
 app.get('/welcome/:jws', (req, res) => {
@@ -145,13 +164,22 @@ app.get('/welcome/:jws', (req, res) => {
       var aud = redirect_uri; 
       var serial_number = 1;
       var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: serial_number, svipeid: svipeid}}; // This is what is issued. The client will only add if svipeid matches
-      generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2, logo).then( function(response) {
+      var signature_request = "https://www.lipsum.com/privacy.pdf"
+      var requests3 = {svipeid: {essential:true}, given_name:null, family_name: null, signature_request: signature_request};
+
+      generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2,requests3, logo).then( function(response) {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
         var srcpic2 = response.srcpic2;
         var jwsCompact2 = response.jwsCompact2;
+        var srcpic3 = response.srcpic3;
+        var jwsCompact3 = response.jwsCompact3;
         console.log("requests", requests);
-        res.render('welcome', {layout: 'index', credential: credential,sessionID: sessionID, logo: logo, name: name, srcpic: srcpic, jwsCompact: jwsCompact, srcpic2: srcpic2, jwsCompact2: jwsCompact2});
+        res.render('welcome', {layout: 'index', credential: credential,sessionID: sessionID, logo: logo, name: name, 
+          srcpic: srcpic, jwsCompact: jwsCompact, 
+          srcpic2: srcpic2, jwsCompact2: jwsCompact2,
+          srcpic3: srcpic3, jwsCompact3: jwsCompact3
+        });
       });
     }
   }
@@ -249,7 +277,6 @@ app.post('/callback', (req, res) => {
       res.end(statusNOK);
     }
 })
-
 
 // This must be relative to the client_id/redirect_uri
 
@@ -381,7 +408,7 @@ async function memberBadge(path,sessionID, redirect_uri, aud, claims, registrati
   
 }
 
-async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, claims2, registration) {
+async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, claims2, claims3, registration) {
 
     var sub_jwk  = acmeKey.toJWK(true);
     sub_jwk.use = "sig"
@@ -392,7 +419,11 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
 
     var payload2 = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: sub_jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
     scope:"openid profile", state: sessionID, nonce: sessionID, registration: registration, claims: claims2};
-    console.log("payload", payload);
+    console.log("payload2", payload2);
+
+    var payload3 = {response_type: "id_token", client_id: redirect_uri, iss: domain,sub: sub_jwk.kid, sub_jwk: sub_jwk, aud: [aud], 
+    scope:"openid profile", state: sessionID, nonce: sessionID, registration: registration, claims: claims3};
+    console.log("payload3", payload3);
 
     var jwsCompact = jose.JWT.sign(payload, acmeKey, 
         {
@@ -413,8 +444,19 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
           expiresIn: "5m"
       }
     )
+
+
+    var jwsCompact3 = jose.JWT.sign(payload3, acmeKey, 
+      {
+          header: {
+              kid: sub_jwk.kid
+           },
+          expiresIn: "5m"
+      }
+    )
     console.log(jwsCompact);
     console.log(jwsCompact2);
+    console.log(jwsCompact3);
 
     try {
       var token = await shorten(jwsCompact);
@@ -427,7 +469,12 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
       console.log("token2", token2);
       console.log("URL ", urlString2);
 
-      var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact, srcpic2: await QRCode.toDataURL(urlString2), jwsCompact2: jwsCompact2};
+      var token3 = await shorten(jwsCompact3);
+      var urlString3 = "https://app.svipe.io/auth/"+token3;
+      console.log("token3", token3);
+      console.log("URL ", urlString3);
+
+      var ret =  {srcpic: await QRCode.toDataURL(urlString), jwsCompact: jwsCompact, srcpic2: await QRCode.toDataURL(urlString2), jwsCompact2: jwsCompact2, srcpic3: await QRCode.toDataURL(urlString3), jwsCompact3: jwsCompact3};
       return ret;
     } catch { // Display a friendly error page
       console.error("qr");
