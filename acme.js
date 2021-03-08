@@ -19,14 +19,17 @@ const QRCode = require('qrcode');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 var request = require('request');
+const fetch = require('node-fetch');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const cors = require('cors');
-var clients = {}; // Keep track of outstanding connections
-var tokens = {}; // Outstanding membership tokens that the client might pickup
 const base64url = require('base64url');
 const jose = require('jose');
+const crypto = require('crypto');
 const { Session } = require('inspector');
+var clients = {}; // Keep track of outstanding connections
+var tokens = {}; // Outstanding membership tokens that the client might pickup
+
 // need this?
 
 const {
@@ -164,8 +167,10 @@ app.get('/welcome/:jws', (req, res) => {
       var aud = redirect_uri; 
       var serial_number = 1;
       var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: serial_number, svipeid: svipeid}}; // This is what is issued. The client will only add if svipeid matches
-      var signature_request = "https://www.lipsum.com/privacy.pdf"
-      var requests3 = {signature_request: signature_request,svipeid: {essential:true}, given_name:null, family_name: null};
+      //var hash = crypto.createHash('sha256').update('alice', 'utf8').digest();
+      var signature_request = {data: fileURL, hash:"6c6636849aeb86eb0213f040baaceb3c4b614da4a5fe6da51656a63a13224d6f"};
+      console.log("signature_request",signature_request);
+      var requests3 = {signature_request: signature_request, svipeid: {essential:true}, given_name:null, family_name: null};
 
       generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2,requests3, logo).then( function(response) {
         var srcpic = response.srcpic;
@@ -181,6 +186,8 @@ app.get('/welcome/:jws', (req, res) => {
           srcpic3: srcpic3, jwsCompact3: jwsCompact3
         });
       });
+
+
     }
   }
 })
@@ -295,6 +302,21 @@ app.post('/callback/progress', (req, res) => {
       res.end(statusNOK);
     }
 });
+
+async function fileHash(url, algorithm = 'sha256') {
+  return new Promise((resolve, reject) => {
+    let shasum = crypto.createHash(algorithm);
+    try {
+      let s = fetch(url);
+      console.log("pdf", s);
+      shasum.update(s);
+      const hash = shasum.digest('hex');
+      return resolve(hash);
+    } catch (error) {
+      return reject('calc fail');
+    }
+  });
+}
 
 function verifyPayload(header, payload, aud) {
 
