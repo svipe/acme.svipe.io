@@ -165,7 +165,7 @@ app.get('/welcome/:jws', (req, res) => {
       var serial_number = 1;
       var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: serial_number, svipeid: svipeid}}; // This is what is issued. The client will only add if svipeid matches
       var signature_request = "https://www.lipsum.com/privacy.pdf"
-      var requests3 = {svipeid: {essential:true}, given_name:null, family_name: null, signature_request: signature_request};
+      var requests3 = {signature_request: signature_request,svipeid: {essential:true}, given_name:null, family_name: null};
 
       generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2,requests3, logo).then( function(response) {
         var srcpic = response.srcpic;
