@@ -121,7 +121,7 @@ $(document).ready(function() {
 
 function showQR() {
     
-    document.getElementById("l").src ="svipe://{{{jwsCompact}}}";
+    document.getElementById("l").src ="svipe:///auth/{{{jwsCompact}}}";
     setTimeout(function() {
         console.log(document.getElementById("l").src);
         $("#signin").hide();
