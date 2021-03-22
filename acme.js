@@ -169,7 +169,7 @@ app.get('/welcome/:jws', (req, res) => {
       var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: serial_number, svipeid: svipeid}}; // This is what is issued. The client will only add if svipeid matches
       //var hash = crypto.createHash('sha256').update('alice', 'utf8').digest();
       var fileURL = "https://www.lipsum.com/privacy.pdf"; 
-      var signature_request = {data: fileURL, hash:"6c6636849aeb86eb0213f040baaceb3c4b614da4a5fe6da51656a63a13224d6f"};
+      var signature_request = {data: fileURL, hash:"aedac29095f2765f052578585fcac91ef542cfe797469e788e527854315845ad"};
       console.log("signature_request",signature_request);
       var requests3 = {signature_request: signature_request, svipeid: {essential:true}};
       generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2,requests3, logo).then( function(response) {

@@ -61,15 +61,19 @@ portant;}
                     <img id="profile__logo__app-image" height=100  src="{{{logo}}}"></img>
                 </p>
             </div>
+            {{#if badge}}
             <div id="badge">
                 {{{badge}}}
             </div>
+            {{/if}}
+            {{#if signature}}
             <div id="signature">
               <p>
                 {{{signature}}}
               </p>
               <p>has now been signed</p> 
             </div>
+            {{/if}}
         </div>
     </div>
 </body>
