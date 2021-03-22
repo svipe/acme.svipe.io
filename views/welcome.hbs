@@ -128,11 +128,13 @@ portant;}
             </div>
         </div>
     </div>
+    <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
 </body>
 </html>
 
 <script type="text/javascript">
 var redirect_uri = "{{{redirect_uri}}}";
+
 $(document).ready(function() {
   setupSocket();
   $("#contract").hide();
@@ -144,9 +146,18 @@ $(document).ready(function() {
 });
 
 function showPickupQR() {
-    $("#pickup").hide();
-    $("#badge").show();
-    $("#cancelpickup").show();
+    document.getElementById("l").src ="svipe:///cred/{{{jwsCompact}}}";
+    setTimeout(function() {
+        console.log(document.getElementById("l").src);
+          $("#pickup").hide();
+        $("#badge").show();
+        $("#cancelpickup").show();
+        // Link to the App Store should go here -- only fires if deep link fails  
+        console.log("fail");              
+        //window.location = "https://itunes.apple.com/us/app/my.app/id123456789?ls=1&mt=8";
+    }, 500);
+
+ 
 }
 
 function cancelPickup() {
@@ -157,9 +168,16 @@ function cancelPickup() {
 
 
 function showMembersQR() {
-    $("#members-only").hide();
-    $("#members").show();
-    $("#cancelmembers").show();
+    document.getElementById("l").src ="svipe:///auth/{{{jwsCompact2}}}";
+    setTimeout(function() {
+        console.log(document.getElementById("l").src);
+        $("#members-only").hide();
+        $("#members").show();
+        $("#cancelmembers").show();
+        // Link to the App Store should go here -- only fires if deep link fails  
+        console.log("fail");              
+        //window.location = "https://itunes.apple.com/us/app/my.app/id123456789?ls=1&mt=8";
+    }, 500);
 }
 
 function cancelMembers() {
@@ -169,9 +187,16 @@ function cancelMembers() {
 }
 
 function showContractQR() {
-    $("#signcontract").hide();
-    $("#contract").show();
-    $("#cancelcontract").show();
+    document.getElementById("l").src ="svipe:///auth/{{{jwsCompact3}}}";
+    setTimeout(function() {
+        console.log(document.getElementById("l").src);
+        $("#signcontract").hide();
+        $("#contract").show();
+        $("#cancelcontract").show();
+        // Link to the App Store should go here -- only fires if deep link fails  
+        console.log("fail");              
+        //window.location = "https://itunes.apple.com/us/app/my.app/id123456789?ls=1&mt=8";
+    }, 500);
 }
 
 function cancelContract() {
