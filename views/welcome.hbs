@@ -126,6 +126,27 @@ portant;}
                     </div>
                 </div>
             </div>
+
+            <div> 
+                <div class="only-desktop">
+                    <div id=signmessage>
+                    <h3>          
+                        <p><a href="javascript:showMessage()">Sign a text message</a></p>
+                    </h3>
+                    </div>
+                    <div id="message" >      
+                    <p>Write your message and click submit</p>
+                    <form onSubmit="alert(1)">
+                    <textarea rows="5" cols="50">
+                    </textarea>
+                    <input type=submit >
+                    </form>
+                    <p>
+                        Lorem ipsum
+                        <a href=/signature/Lorem+ipsum/XXX(EHk9/>https://svipe.com/signature/Lorem+ipsum/XXX(EHk9/</a>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
     <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
@@ -143,6 +164,7 @@ $(document).ready(function() {
   $("#members").hide();
   $("#cancel").hide();
   $("#progress").hide();
+  $("#message").hide();
 });
 
 function showPickupQR() {
@@ -197,6 +219,11 @@ function showContractQR() {
         console.log("fail");              
         //window.location = "https://itunes.apple.com/us/app/my.app/id123456789?ls=1&mt=8";
     }, 500);
+}
+
+
+function showMessage() {
+    $("#message").show();  
 }
 
 function cancelContract() {

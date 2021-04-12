@@ -235,7 +235,9 @@ app.get('/callback/token/:uuid', (req, res) => {
 })
 
 app.post('/callback', (req, res) => {
-    console.log("callback");
+
+    console.log("posted to callback");
+   
     var uuid = req.body.uuid;
     var statusOK = JSON.stringify({status:'OK'});
     var statusNOK = JSON.stringify({status:'NOK'});
@@ -246,7 +248,7 @@ app.post('/callback', (req, res) => {
       // now we need to verify stuff before updating ...
       var token = req.body.jwt;
       var parts = token.split('.');
-      
+      console.log("received jwt", token);
       var header = JSON.parse(base64url.decode(parts[0]));
       var payload = JSON.parse(base64url.decode(parts[1]));
       var signature = base64url.decode(parts[2]);
