@@ -283,7 +283,6 @@ app.post('/callback', (req, res) => {
       }
     } else {
       console.error("uuid ",uuid);
-      console.error("clients ",clients);
       res.end(statusNOK);
     }
 })
