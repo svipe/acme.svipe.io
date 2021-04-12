@@ -282,6 +282,8 @@ app.post('/callback', (req, res) => {
         res.end(statusNOK);
       }
     } else {
+      console.error("uuid ",uuid);
+      console.error("clients ",clients);
       res.end(statusNOK);
     }
 })
