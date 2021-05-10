@@ -99,6 +99,7 @@ app.get('/', (req, res) => {
     console.log(sessionID);
     generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
       var srcpic = response.srcpic;
+      console.log(srcpic);
       var jwsCompact = response.jwsCompact;
       console.log("requests", requests);
       res.render('main', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
