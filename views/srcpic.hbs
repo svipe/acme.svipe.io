@@ -116,11 +116,12 @@ function setupSocket() {
                 console.log("sub_jwk", sub_jwk);
                 console.log("sub", sub);
                 //console.log("verify payload", isVerified);
-                
-                console.log("payload", payload);
+
+                console.log("payload claims", payload.claims);
 
                 var name = window.parent.document.getElementById("name");
                 var document_number = window.parent.document.getElementById("document_number");
+
                 var fullname = "";
                 if (payload.claims.given_name != nil) {
                     fullname += payload.claims.given_name + " ";
@@ -128,15 +129,14 @@ function setupSocket() {
                 if (payload.claims.family_name != nil) {
                     fullname += payload.claims.family_name ;
                 }
-
                 name.value = fullname;
-
+                /*
                 var doc_number = "";
                 if (payload.claims.document_number != nil) {
                     doc_number += payload.claims.document_number;
                 }
 
-                document_number.value = doc_number;
+                document_number.value = doc_number;*/
 
                 $("qrcode").hide();
             } else {
