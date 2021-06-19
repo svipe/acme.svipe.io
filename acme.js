@@ -73,7 +73,7 @@ app.use(bodyParser.json());
 // These are the only parameters you need to provide
 
 var domain = "acme.svipe.io";
-const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'))
+const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'));
 
 var credential =  {iss: "Acme", name: "Covid19", type: "Vaccination", id: null}
 var requests2 = { credential: credential}; // id could f.i be a certain batch
@@ -92,21 +92,23 @@ app.get('/svipe', (req, res) => {
 });
 
 app.get('/srcpic', (req, res) => {
+  console.log("SRCPIC");
   var redirect_uri = host+"/callback"; 
   var logo = host + "/logo.png";
   var sessionID = req.sessionID;
   var aud = redirect_uri; 
-  console.log(sessionID);
+  console.log("sessionID", sessionID);
   var requests = {svipeid: {essential:true}, given_name:null, family_name: null, document_number: null};
   generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
     var srcpic = response.srcpic;
     var jwsCompact = response.jwsCompact;
-    console.log("requests", requests);
+    console.log("srcpic requests", requests);
     res.render('srcpic', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
   });
 });
 
 app.get('/', (req, res) => {
+    console.log("HOME");
     var redirect_uri = host+"/callback"; 
     var logo = host + "/logo.png";
     var sessionID = req.sessionID;
@@ -123,19 +125,7 @@ app.get('/', (req, res) => {
 
 
 app.get('/form', (req, res) => {
-  var redirect_uri = host+"/callback_form"; 
-  var logo = host + "/logo.png";
-  var sessionID = req.sessionID;
-  var aud = redirect_uri; 
-  var requests = {svipeid: {essential:true}, given_name:null, family_name: null, document_number: null};
-  console.log(sessionID);
-  generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
-    var srcpic = response.srcpic;
-    console.log(srcpic);
-    var jwsCompact = response.jwsCompact;
-    console.log("requests", requests);
-    res.render('form', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
-  });
+  res.render('form', {layout: 'index'});
 });
 
 // Demo how to sign a contract
@@ -631,6 +621,7 @@ async function generateSigninCode(path,sessionID, redirect_uri, aud, claims, reg
 }
 
 io.on('connection', socket => {
+  console.log("set up socket");
     socket.on('message', msg => {
       console.log("received ",msg);
       if (msg.op == "hello" && msg.uuid) {
