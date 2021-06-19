@@ -82,8 +82,9 @@ function showProgress() {
 
 function setupSocket() {
 
-    //const socket = io('https://acme.svipe.io');
-    const socket = io('http://localhost:4567');
+    const socket = io('https://acme.svipe.io');
+    //const socket = io('http://localhost:4567');
+    console.log("sessionid", "{{{sessionID}}}");
     if (socket == null ) {
         console.error("Socket could not be opened");
         return;

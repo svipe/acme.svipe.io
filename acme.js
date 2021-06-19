@@ -378,6 +378,7 @@ app.post('/callback/progress', (req, res) => {
       socket.emit("message", msg);
       res.end(statusOK);
     } else {
+      console.log("clients", clients);
       console.error("Could not find client to showProgress for ", uuid);
       res.end(statusNOK);
     }
