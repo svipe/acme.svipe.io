@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Acme Registration</title>
-<link rel="icon" href="/logo.png" />
+<title>Acme Login</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<link rel="icon" href="https://acme.svipe.com/logo.png" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <style>
     html, body { height: 100%;}
@@ -50,35 +52,62 @@ portant;}
   .only-mobile  {display:initial;}
 }: 
 </style>
-
 </head>
-
 <body>
-    <div >
-        <div class="modal-body text-center">
-            <div class="profile__logo" id="" aria-hidden="true" >
-                <p>
-                    <a href=/><img id="profile__logo__app-image" height=100  src="{{{logo}}}"></img></a>
-                </p>
-            </div>
-            <div id="form">
-                <h3>
-                <div class="only-mobile">
-                    Does not work on mobile yet
-                </div>
-                <div class="only-desktop">
-                <form>
-                    <input name="name" placeholder="name"></br>
-                    </br>
-                    <input name="document_number" placeholder="document number">
-                    </form>
-                </div>
-                </h3>
-                <iframe frameborder=0 id="qr" width=300 height=300 src=/srcpic></iframe>
-            </div>
-            <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
+        <div id="qrcode"><img src={{{srcpic}}} width="100%"></div> 
+        <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
 </body>
 </html>
 
 <script type="text/javascript">
+
+var redirect_uri = "{{{redirect_uri}}}";
+
+$(document).ready(function() {
+  setupSocket();
+  $("#signup").show();
+  $("#cancel").hide();
+  $("#progress").hide();
+});
+
+function showProgress() {
+    $("#signup").hide();
+    $("#promotion").hide();
+    $("#cancel").show();
+    $("#progress").show();
+}
+
+function setupSocket() {
+
+    //const socket = io('https://acme.svipe.io');
+    const socket = io('http://localhost:4567');
+    if (socket == null ) {
+        console.error("Socket could not be opened");
+        return;
+    }
+    var helloMsg = {op: 'hello', uuid: '{{{sessionID}}}' };
+    socket.emit("message", helloMsg);
+    socket.on("message", function(msg) {
+        console.log("received ",msg);
+        if (msg.op == "hello") {
+            console.log("socket established");
+        } else if (msg.op == "progress") {
+            console.log("progress");
+            showProgress();
+        } else if (msg.op == "authdone") {
+            var jws = msg.jwt;
+            var sub = msg.sub;
+            if (jws != null) {
+                console.log("received jws token", jws);
+                socket.close();
+                // Now redirect 
+                window.location.href = "/welcome/"+jws;
+            } else {
+                console.error("No jws token received");
+            }
+        } else {
+            console.error("Could not contact socket server")
+        }
+    });   
+}
 </script>
