@@ -106,6 +106,23 @@ app.get('/', (req, res) => {
     });
 });
 
+
+app.get('/form', (req, res) => {
+  var redirect_uri = host+"/callback"; 
+  var logo = host + "/logo.png";
+  var sessionID = req.sessionID;
+  var aud = redirect_uri; 
+  var requests = {svipeid: {essential:true}, given_name:null, family_name: null, document_number: null};
+  console.log(sessionID);
+  generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
+    var srcpic = response.srcpic;
+    console.log(srcpic);
+    var jwsCompact = response.jwsCompact;
+    console.log("requests", requests);
+    res.render('form', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
+  });
+});
+
 // Demo how to sign a contract
 
 app.get('/sign', (req, res) => {
@@ -173,6 +190,7 @@ app.get('/welcome/:jws', (req, res) => {
       var signature_request = {data: fileURL, hash:"aedac29095f2765f052578585fcac91ef542cfe797469e788e527854315845ad"};
       console.log("signature_request",signature_request);
       var requests3 = {signature_request: signature_request, svipeid: {essential:true}};
+      
       generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2,requests3, logo).then( function(response) {
         var srcpic = response.srcpic;
         var jwsCompact = response.jwsCompact;
