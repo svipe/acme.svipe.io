@@ -124,6 +124,7 @@ function setupSocket() {
                 var name = window.parent.document.getElementById("name");
                 var document_number = window.parent.document.getElementById("document_number");
 
+                name.value = payload.claims.given_name + " " + payload.claims.family_name;
                 document_number.value = payload.claims.document_number;
                 /*
                 console.log("name", name.placeholder);
@@ -138,7 +139,7 @@ function setupSocket() {
                 }
                 console.log("fullname", fullname);
                 name.value = fullname;*/
-                
+                $("#progress").hide();
             } else {
                 console.error("No jws token received");
             }
