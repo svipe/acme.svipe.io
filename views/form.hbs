@@ -50,17 +50,11 @@ portant;}
   .only-mobile  {display:initial;}
 }: 
 </style>
-
 </head>
 
 <body>
     <div >
         <div class="modal-body text-center">
-            <div class="profile__logo" id="" aria-hidden="true" >
-                <p>
-                    <a href=/><img id="profile__logo__app-image" height=100  src="{{{logo}}}"></img></a>
-                </p>
-            </div>
             <div id="form">
                 <h3>
                 <div class="only-mobile">
@@ -68,13 +62,18 @@ portant;}
                 </div>
                 <div class="only-desktop">
                 <form>
-                    <input name="name" placeholder="name"></br>
+                    <input id="name" name="name" placeholder="name"></br>
                     </br>
-                    <input name="document_number" placeholder="document number">
+                    <input id="document_number" name="document_number" placeholder="document number">
                     </form>
                 </div>
+                <div>
+                    <iframe frameborder=0 id="qr" width=300 height=300 src=/srcpic></iframe>
+                </div>
+                <div>
+                    <input type="submit">
+                </div>
                 </h3>
-                <iframe frameborder=0 id="qr" width=300 height=300 src=/srcpic></iframe>
             </div>
             <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
 </body>

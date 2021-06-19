@@ -64,6 +64,9 @@ portant;}
 var redirect_uri = "{{{redirect_uri}}}";
 
 $(document).ready(function() {
+  var name = window.parent.document.getElementById("name");
+  console.log(name.placeholder);
+  name.value = "rand";
   setupSocket();
   $("#signup").show();
   $("#cancel").hide();
