@@ -56,7 +56,8 @@ portant;}
 <body>
         <div id="qrcode"><img src={{{srcpic}}} width="100%"></div> 
         <div id="progress">
-            <p>Waiting for approval of the selective disclosure request</p>
+            <br>
+            <p>Waiting for data.</p>
         </div>
 </body>
 </html>
@@ -129,6 +130,7 @@ function setupSocket() {
                 if (payload.claims.family_name != nil) {
                     fullname += payload.claims.family_name ;
                 }
+                console.log("fullname", fullname);
                 name.value = fullname;
                 /*
                 var doc_number = "";
