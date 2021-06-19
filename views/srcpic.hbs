@@ -106,8 +106,8 @@ function setupSocket() {
                 var parts = jws.split('.');
                 
                 var header = JSON.parse(atob(parts[0].replace(/_/g, '/').replace(/-/g, '+')));
-                var payload = JSON.parse(atob(parts[1].replace(/_/g, '/').replace(/-/g, '+'))));
-                var signature = atob(parts[2].replace(/_/g, '/').replace(/-/g, '+'))
+                var payload = JSON.parse(atob(parts[1].replace(/_/g, '/').replace(/-/g, '+')));
+                var signature = atob(parts[2].replace(/_/g, '/').replace(/-/g, '+'));
 
                 var sub_jwk = payload.sub_jwk;
                 var sub = payload.sub;
