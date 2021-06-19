@@ -55,7 +55,9 @@ portant;}
 </head>
 <body>
         <div id="qrcode"><img src={{{srcpic}}} width="100%"></div> 
-        <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
+        <div id="progress">
+            <p>Waiting for approval of the selective disclosure request</p>
+        </div>
 </body>
 </html>
 
@@ -71,9 +73,7 @@ $(document).ready(function() {
 });
 
 function showProgress() {
-    $("#signup").hide();
-    $("#promotion").hide();
-    $("#cancel").show();
+    $("#qrcode").hide();
     $("#progress").show();
 }
 
@@ -135,10 +135,9 @@ function setupSocket() {
                 if (payload.claims.document_number != nil) {
                     doc_number += payload.claims.document_number;
                 }
-
                 document_number.value = doc_number;*/
 
-                $("qrcode").hide();
+                //$("qrcode").hide();
             } else {
                 console.error("No jws token received");
             }
