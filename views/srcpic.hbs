@@ -64,9 +64,6 @@ portant;}
 var redirect_uri = "{{{redirect_uri}}}";
 
 $(document).ready(function() {
-  var name = window.parent.document.getElementById("name");
-  console.log(name.placeholder);
-  name.value = "rand";
   setupSocket();
   $("#signup").show();
   $("#cancel").hide();
@@ -104,8 +101,39 @@ function setupSocket() {
             if (jws != null) {
                 console.log("received jws token", jws);
                 socket.close();
-                // Now redirect 
-                window.location.href = "/welcome/"+jws;
+                // Now extract the attributes 
+               
+                var parts = jws.split('.');
+                var header = JSON.parse(base64url.decode(parts[0]));
+                var payload = JSON.parse(base64url.decode(parts[1]));
+                var signature = base64url.decode(parts[2]);
+
+                var sub_jwk = payload.sub_jwk;
+                var sub = payload.sub;
+                var isVerified = verifyPayload(header, payload, domain);
+
+                console.log("sub_jwk", sub_jwk);
+                console.log("sub", sub);
+                console.log("verify payload", isVerified);
+                var name = window.parent.document.getElementById("name");
+                var document_number = window.parent.document.getElementById("document_number");
+                var fullname = "";
+                if (payload.claims.given_name != nil) {
+                    fullname += payload.claims.given_name + " ";
+                }
+                if (payload.claims.family_name != nil) {
+                    fullname += payload.claims.family_name ;
+                }
+
+                name.value = fullname;
+
+                var doc_number = "";
+                if (payload.claims.document_number != nil) {
+                    doc_number += payload.claims.document_number;
+                }
+
+                document_number.value = doc_number;
+
             } else {
                 console.error("No jws token received");
             }
