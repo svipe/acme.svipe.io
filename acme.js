@@ -92,7 +92,7 @@ app.get('/svipe', (req, res) => {
 });
 
 app.get('/srcpic', (req, res) => {
-  console.log("SRCPIC");
+  console.log("SRCPIC", req);
   var redirect_uri = host+"/callback"; 
   var logo = host + "/logo.png";
   var sessionID = req.sessionID;
