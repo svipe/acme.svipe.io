@@ -97,9 +97,9 @@ app.get('/srcpic', (req, res) => {
   var sessionID = req.sessionID;
   var aud = redirect_uri; 
   console.log(sessionID);
+  var requests = {svipeid: {essential:true}, given_name:null, family_name: null, document_number: null};
   generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
     var srcpic = response.srcpic;
-    console.log(srcpic);
     var jwsCompact = response.jwsCompact;
     console.log("requests", requests);
     res.render('srcpic', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
@@ -475,7 +475,8 @@ function shorten(data) {
   return new Promise((resolve, reject) => {
       request.post({
         headers: {'content-type' : 'application/x-www-form-urlencoded'},
-        url:     "https://api.svipe.com/v1/shortenurl",
+        url:     "https://api.dev.bes.svipeid.com/v1/shortenurl",
+        //url:     "https://api.svipe.com/v1/shortenurl",
         body:    data
       }, (error, response, body) => {
           if (error) reject(error);
@@ -572,6 +573,7 @@ async function generateWelcomeCodes(path,sessionID, redirect_uri, aud, claims, c
 
     try {
       var token = await shorten(jwsCompact);
+
       var urlString = "https://app.svipe.io/"+path+"/"+token;
       console.log("token", token);
       console.log("URL ", urlString);
