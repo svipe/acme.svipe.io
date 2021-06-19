@@ -119,7 +119,8 @@ function setupSocket() {
                 //console.log("verify payload", isVerified);
 
                 console.log("payload claims", payload.claims);
-
+                console.log("document_number", payload.claims.document_number);
+                
                 var name = window.parent.document.getElementById("name");
                 var document_number = window.parent.document.getElementById("document_number");
 
