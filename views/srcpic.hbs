@@ -57,7 +57,7 @@ portant;}
         <div id="qrcode"><img src={{{srcpic}}} width="100%"></div> 
         <div id="progress">
             <br>
-            <p>Waiting for data.</p>
+            <center><p>Waiting for data.</p></center>
         </div>
 </body>
 </html>
@@ -120,10 +120,12 @@ function setupSocket() {
 
                 console.log("payload claims", payload.claims);
                 console.log("document_number", payload.claims.document_number);
-                
+
                 var name = window.parent.document.getElementById("name");
                 var document_number = window.parent.document.getElementById("document_number");
 
+                document_number = payload.claims.document_number;
+                
                 console.log("name", name.placeholder);
                 console.log("document_number", document_number.placeholder);
 
