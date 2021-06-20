@@ -259,59 +259,6 @@ app.get('/callback/token/:uuid', (req, res) => {
 })
 
 
-app.post('/callback_form', (req, res) => {
-
-  console.log("posted to callback");
- 
-  var uuid = req.body.uuid;
-  var statusOK = JSON.stringify({status:'OK'});
-  var statusNOK = JSON.stringify({status:'NOK'});
-
-  var socket = clients[uuid];
-  if (socket != undefined || socket != null ) {
-    console.log("Has client for ", uuid);
-    // now we need to verify stuff before updating ...
-    var token = req.body.jwt;
-    var parts = token.split('.');
-    console.log("received jwt", token);
-    var header = JSON.parse(base64url.decode(parts[0]));
-    var payload = JSON.parse(base64url.decode(parts[1]));
-    var signature = base64url.decode(parts[2]);
-
-    var sub_jwk = payload.sub_jwk;
-    var sub = payload.sub;
-    var isVerified = verifyPayload(header, payload, domain);
-
-    console.log("sub_jwk", sub_jwk);
-    console.log("sub", sub);
-    console.log("verify payload", isVerified);
-
-    if (isVerified) {
-      var msg = {op:'authdone', jwt: token, sub: sub};
-      console.log("callback msg",msg);
-      socket.emit("message", msg);
-      var svipeid = payload.claims.svipeid;
-      var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: svipeid}}; // This is what is issued. The client will only add if svipeid matches
-      var logo = host + "/logo.png";
-      var redirect_uri = host+"/callback_form"; 
-      var aud = redirect_uri; 
-      memberBadge("cred",uuid, redirect_uri, aud, claims, logo).then( function(response) {
-        var jwsCompact = response.jwsCompact;
-        tokens[uuid] = jwsCompact;
-      });
-      // This is where you could set a cookie. 
-      // The browser will redirect to the Welcome page specified by redirect_uri.
-      res.end(statusOK);
-    } else {
-      console.error("could not verify token");
-      res.end(statusNOK);
-    }
-  } else {
-    console.error("uuid ",uuid);
-    res.end(statusNOK);
-  }
-})
-
 app.post('/callback', (req, res) => {
 
     console.log("posted to callback");
