@@ -123,22 +123,12 @@ function setupSocket() {
 
                 var name = window.parent.document.getElementById("name");
                 var document_number = window.parent.document.getElementById("document_number");
+                var jws_hidden = window.parent.document.getElementById("jws");
 
                 name.value = payload.claims.given_name + " " + payload.claims.family_name;
                 document_number.value = payload.claims.document_number;
-                /*
-                console.log("name", name.placeholder);
-                console.log("document_number", document_number.placeholder);
-
-                var fullname = "";
-                if (payload.claims["given_name"] != nil) {
-                    fullname += payload.claims["given_name"] + " ";
-                }
-                if (payload.claims["family_name"] != nil) {
-                    fullname += payload.claims["family_name"] ;
-                }
-                console.log("fullname", fullname);
-                name.value = fullname;*/
+                jws_hidden.value = jws;
+                
                 $("#progress").hide();
             } else {
                 console.error("No jws token received");
