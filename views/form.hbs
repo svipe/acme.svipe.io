@@ -94,12 +94,12 @@ window.addEventListener("jws", (event) => {
         var sub = payload.sub;
         //var isVerified = verifyPayload(header, payload, domain);
 
-        console.log("sub_jwk", sub_jwk);
-        console.log("sub", sub);
+        console.log("form sub_jwk", sub_jwk);
+        console.log("form sub", sub);
         //console.log("verify payload", isVerified);
 
-        console.log("payload claims", payload.claims);
-        console.log("document_number", payload.claims.document_number);
+        console.log("form payload claims", payload.claims);
+        console.log("form document_number", payload.claims.document_number);
 
         var name = document.getElementById("name");
         var document_number = document.getElementById("document_number");
