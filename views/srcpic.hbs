@@ -103,7 +103,8 @@ function setupSocket() {
                 console.log("received jws token", jws);
                 socket.close();
                 // Now extract the attributes 
-               
+                console.log("posting Message", jws);
+                window.parent.postMessage(jws);
                 var parts = jws.split('.');
                 
                 var header = JSON.parse(atob(parts[0].replace(/_/g, '/').replace(/-/g, '+')));
