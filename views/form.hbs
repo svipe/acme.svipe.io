@@ -84,6 +84,8 @@ portant;}
 window.addEventListener("jws", (event) => {
   //if (event.origin !== "https://acme.svipe.io")
   //  return;
+
+        console.log("event listener");
         var parts = jws.split('.');
                 
         var header = JSON.parse(atob(parts[0].replace(/_/g, '/').replace(/-/g, '+')));
