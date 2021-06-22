@@ -98,7 +98,7 @@ app.get('/srcpic', (req, res) => {
   var sessionID = req.sessionID;
   var aud = redirect_uri; 
   console.log("sessionID", sessionID);
-  var requests = {svipeid: {essential:true}, given_name:null, family_name: null, document_number: null, document_type: null, issuing_country: null, birth_date: null, person_number: null};
+  var requests = {svipeid: {essential:true}, given_name: null, family_name: null, document_number: null, document_type: null, issuing_country: null, birth_date: null, person_number: null};
   generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
     var srcpic = response.srcpic;
     var jwsCompact = response.jwsCompact;

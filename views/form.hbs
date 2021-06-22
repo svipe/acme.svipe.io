@@ -81,4 +81,33 @@ portant;}
 </html>
 
 <script type="text/javascript">
+window.addEventListener("message", (event) => {
+  //if (event.origin !== "https://acme.svipe.io")
+  //  return;
+        var parts = jws.split('.');
+                
+        var header = JSON.parse(atob(parts[0].replace(/_/g, '/').replace(/-/g, '+')));
+        var payload = JSON.parse(atob(parts[1].replace(/_/g, '/').replace(/-/g, '+')));
+        var signature = atob(parts[2].replace(/_/g, '/').replace(/-/g, '+'));
+
+        var sub_jwk = payload.sub_jwk;
+        var sub = payload.sub;
+        //var isVerified = verifyPayload(header, payload, domain);
+
+        console.log("sub_jwk", sub_jwk);
+        console.log("sub", sub);
+        //console.log("verify payload", isVerified);
+
+        console.log("payload claims", payload.claims);
+        console.log("document_number", payload.claims.document_number);
+
+        var name = document.getElementById("name");
+        var document_number = document.getElementById("document_number");
+        var jws_hidden = document.getElementById("jws");
+
+        name.value = payload.claims.given_name + " " + payload.claims.family_name;
+        document_number.value = payload.claims.document_number;
+        jws_hidden.value = jws;
+  
+}, false);
 </script>
