@@ -68,12 +68,25 @@ portant;}
                 <h3>
                 <div class="only-mobile">
                     <a href=https://app.svipe.com/auth/{{{jwsCompact}}}?mobile=1>Sign in with Svipe iD</a>
+                    <a href=https://meet.svipe.io/auth/{{{jwsCompact}}}?mobile=1>Authenticated Video Call</a>
                 </div>
                 <div class="only-desktop">
                 <a href = "javascript:showQR()">Sign in with Svipe iD</a><br/>
-                <a href = "/form">Populate form</a>
+                <a href = "/form">Populate form</a><br/>
+                <a href = "/meet">Unauthenticated Video Call</a><br/>
+                <a href = "javascript:showMeetQR()">Authenticated Video Call</a>
                 </div>
                 </h3>
+            </div>
+            <div id="meetsignin">
+                <p>To sign in using your Svipe iD, please scan this code</p>
+                <!-- How to do this dynamically using handlebars? -->
+                <p>You will be asked to share: 
+                {{#each claims}}
+                {{@key}}
+                {{/each}}
+                </p>
+                <div id="meetqrcode"><img src={{{srcpic}}} width="30%"></div>
             </div>
             <div id="signup">
                 <p>To sign in using your Svipe iD, please scan this code</p>
@@ -111,18 +124,35 @@ portant;}
 <script type="text/javascript">
 
 var redirect_uri = "{{{redirect_uri}}}";
-
+var destination = "/welcome/";
 
 $(document).ready(function() {
   setupSocket();
   $("#signup").hide();
+   $("#meetsignin").hide();
   $("#cancel").hide();
   $("#progress").hide();
 });
 
 
-function showQR() {
+function showMeetQR() {
+    destination = "/meet/";
+    document.getElementById("l").src ="svipe:///auth/{{{jwsCompact}}}";
+    setTimeout(function() {
+        console.log(document.getElementById("l").src);
+        $("#signin").hide();
+        $("#meetsignin").show();
+        $("#cancel").show();
+        // Link to the App Store should go here -- only fires if deep link fails  
+        console.log("fail");              
+        //window.location = "https://itunes.apple.com/us/app/my.app/id123456789?ls=1&mt=8";
+    }, 500);
     
+}
+
+
+function showQR() {
+    destination = "/welcome/";
     document.getElementById("l").src ="svipe:///auth/{{{jwsCompact}}}";
     setTimeout(function() {
         console.log(document.getElementById("l").src);
@@ -167,7 +197,7 @@ function setupSocket() {
                 console.log("received jws token", jws);
                 socket.close();
                 // Now redirect 
-                window.location.href = "/welcome/"+jws;
+                window.location.href = destination+jws;
             } else {
                 console.error("No jws token received");
             }

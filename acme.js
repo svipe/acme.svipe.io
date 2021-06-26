@@ -107,6 +107,29 @@ app.get('/srcpic', (req, res) => {
   });
 });
 
+app.get('/meet', (req, res) => {
+  console.log("HOME");
+  res.render('meet', {layout: 'index'});
+  
+});
+
+app.get('/:roomid', (req, res) => {
+  var roomid = req.params["roomid"];
+  console.log("HOME");
+    var redirect_uri = host+"/callback"; 
+    var logo = host + "/logo.png";
+    var sessionID = req.sessionID;
+    var aud = redirect_uri; 
+    console.log(sessionID);
+    generateSigninCode("auth",sessionID, redirect_uri, aud, requests, logo).then( function(response) {
+      var srcpic = response.srcpic;
+      console.log(srcpic);
+      var jwsCompact = response.jwsCompact;
+      console.log("requests", requests);
+      res.render('room', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact});
+    });
+});
+
 app.get('/', (req, res) => {
     console.log("HOME");
     var redirect_uri = host+"/callback"; 
@@ -147,6 +170,73 @@ app.get('/sign', (req, res) => {
     res.render('sign', {layout: 'index', logo: logo,  redirect_uri: redirect_uri, sessionID: sessionID, srcpic: srcpic, claims: requests, jwsCompact:jwsCompact, signature_request:signature_request});
   });
 });
+
+
+app.get('/meet/:jws', (req, res) => {
+  // hmm, need to verify again. in case the token was modfied in the browser
+  var token = req.params["jws"];
+  if (token != null) {
+    console.log("token", token);
+    var parts = token.split('.');
+    var header = JSON.parse(base64url.decode(parts[0]));
+    var payload = JSON.parse(base64url.decode(parts[1]));
+    var signature = base64url.decode(parts[2]);
+
+    var sub_jwk = payload.sub_jwk;
+    var sub = payload.sub;
+    var isVerified = verifyPayload(header, payload, domain);
+
+    console.log("sub_jwk", sub_jwk);
+    console.log("sub", sub);
+    console.log("verify payload",isVerified);
+    var logo = host + "/logo.png";
+    // could really do this in handlebars instead
+    var name = "";
+    var svipeid = payload.claims["svipeid"];
+    var given_name = payload.claims["given_name"];
+    var family_name = payload.claims["family_name"];
+    if (given_name) {
+      name += given_name;
+    }
+    if (family_name) {
+      name += " " + family_name;
+    }
+
+    var credential = payload.claims["credential"];
+    var redirect_uri = host+"/callback"; 
+    var logo = host + "/logo.png";
+
+    if (credential != null) {
+      var badge = JSON.stringify(credential);
+      res.render('members', {layout: 'index', logo: logo, badge: badge});
+    } else {
+      var sessionID = req.sessionID;
+      var aud = redirect_uri; 
+      var serial_number = 1;
+      var claims = { credential: {iss: "Acme", name: "Covid19", type: "Vaccination", id: serial_number, svipeid: svipeid}}; // This is what is issued. The client will only add if svipeid matches
+      //var hash = crypto.createHash('sha256').update('alice', 'utf8').digest();
+      var fileURL = "https://www.lipsum.com/privacy.pdf"; 
+      var signature_request = {data: fileURL, hash:"aedac29095f2765f052578585fcac91ef542cfe797469e788e527854315845ad"};
+      console.log("signature_request",signature_request);
+      var requests3 = {signature_request: signature_request, svipeid: {essential:true}};
+      
+      generateWelcomeCodes("cred",sessionID, redirect_uri, aud, claims, requests2,requests3, logo).then( function(response) {
+        var srcpic = response.srcpic;
+        var jwsCompact = response.jwsCompact;
+        var srcpic2 = response.srcpic2;
+        var jwsCompact2 = response.jwsCompact2;
+        var srcpic3 = response.srcpic3;
+        var jwsCompact3 = response.jwsCompact3;
+        console.log("requests", requests);
+        res.render('welcome', {layout: 'index', credential: credential,sessionID: sessionID, logo: logo, name: name, 
+          srcpic: srcpic, jwsCompact: jwsCompact, 
+          srcpic2: srcpic2, jwsCompact2: jwsCompact2,
+          srcpic3: srcpic3, jwsCompact3: jwsCompact3
+        });
+      });
+    }
+  }
+})
 
 app.get('/welcome/:jws', (req, res) => {
   // hmm, need to verify again. in case the token was modfied in the browser
@@ -413,8 +503,8 @@ function shorten(data) {
   return new Promise((resolve, reject) => {
       request.post({
         headers: {'content-type' : 'application/x-www-form-urlencoded'},
-        url:     "https://api.dev.bes.svipeid.com/v1/shortenurl",
-        //url:     "https://api.svipe.com/v1/shortenurl",
+        //url:     "https://api.dev.bes.svipeid.com/v1/shortenurl",
+        url:     "https://api.svipe.com/v1/shortenurl",
         body:    data
       }, (error, response, body) => {
           if (error) reject(error);
