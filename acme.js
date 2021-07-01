@@ -643,7 +643,7 @@ async function generateSigninCode(path,sessionID, redirect_uri, aud, claims, reg
       }
   )
 
-  console.log(jwsCompact);
+  console.log("jwsCompact",jwsCompact);
 
   try {
     var token = await shorten(jwsCompact);
