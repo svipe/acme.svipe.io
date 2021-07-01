@@ -78,7 +78,7 @@ const acmeKey = jose.JWK.asKey(fs.readFileSync('etc/privkey.pem'));
 var credential =  {iss: "Acme", name: "Covid19", type: "Vaccination", id: null}
 var requests2 = { credential: credential}; // id could f.i be a certain batch
 
-var requests = {svipeid: {essential:true}, given_name:null, family_name: null};
+var requests = {svipeid: {essential:true}, given_name:null, family_name: null, covid19_vaccinated: null, green_vaccination_certificate: null};
 
 // iss: null means any issuer, the same for the other attributes
 // 
