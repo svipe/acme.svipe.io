@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme Login</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<link rel="icon" href="https://acme.svipe.com/logo.png" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<style>
+    html, body { height: 100%;}
+    .container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+      
+@media only screen and (max-device-width:479px) {
+  a  {font-size: 14px !important; line-height: 150% !important;}
+  h1 {font-size: 22px !important; text-align: center; line-height: 120% !im=
+portant;}
+}
+
+@media all {
+  .b-logo    {height: 50px;}
+  .b-wrapper {width: 600px; margin: 0px; padding: 20px 20px 20px 20px;}
+  .b-title   {width: 100vw; margin: 0px; padding: 40px 20px 10px 20px;}
+  .b-message {width: 100vw; margin: 0px; padding:  0px 20px  0px 20px;}
+  .b-qrcode  {width: 100vw; margin: 0px; padding: 20px 20px 20px 20px;}
+  .b-button  {width: 100vw; margin: 0px; padding: 20px 20px 20px 20px;}
+  .b-footer  {width: 100vw; margin: 0px; padding: 20px 20px 20px 20px;}
+}
+@media only screen and (max-device-width:479px) {
+  .b-logo    {height: 40px;}
+  .b-wrapper {width: 100vw; margin: 0px; padding: 10px  0px 15px  0px;}
+  .b-title   {width: 100vw; margin: 0px; padding: 15px  0px  5px  0px;}
+  .b-message {width: 100vw; margin: 0px; padding:  0px  0px  0px  0px;}
+  .b-qrcode  {width: 100vw; margin: 0px; padding: 10px  0px 15px  0px;}
+  .b-button  {width: 100vw; margin: 0px; padding: 10px  0px 15px  0px;}
+  .b-footer  {width: 100vw; margin: 0px; padding: 10px 10px 10px 10px;}
+}
+
+@media all {
+  .only-desktop {display:initial;}
+  .only-mobile  {display:none ;}
+}
+@media only screen and (max-device-width:479px) {
+  .only-desktop {display:none ;}
+  .only-mobile  {display:initial;}
+}: 
+</style>
+
+<style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+</head>
+
+<body>
+    <div >
+        <div class="modal-body text-center">
+            <div class="profile__logo" id="" aria-hidden="true" >
+                <p>
+                    <a href=/><img id="profile__logo__app-image" height=100  src="{{{logo}}}"></img></a>
+                </p>
+            </div>
+            <div id="signin">
+                <h3>
+                <div class="only-mobile">
+                    <a href=https://meet.svipe.io/auth/{{{jwsCompact}}}?mobile=1>Authenticated Video Call</a>
+                </div>
+                <div class="only-desktop" >
+                    You can either sign in using Svipe with your passport details or do it in the call.
+                    <center>
+                    <ul>
+                        <li>
+                            <a href = "/meet">Unauthenticated Video Call</a></li>
+                        <li>
+                            <a href = "javascript:showMeetQR()">Authenticated Video Call</a></li>
+                </ul></center>
+                </div>
+                </h3>
+            </div>
+            <div id="meetsignin">
+                <p>To sign in using your Svipe iD, please scan this code</p>
+                <!-- How to do this dynamically using handlebars? -->
+                <p>You will be asked to share: 
+                {{#each claims}}
+                {{@key}}
+                {{/each}}
+                </p>
+                <div id="meetqrcode"><img src={{{srcpic}}} width="30%"></div>
+            </div>
+            <div id="signup">
+                <p>To sign in using your Svipe iD, please scan this code</p>
+                <!-- How to do this dynamically using handlebars? -->
+                <p>You will be asked to share: 
+                {{#each claims}}
+                {{@key}}
+                {{/each}}
+                </p>
+                <div id="qrcode"><img src={{{srcpic}}} width="30%"></div>
+            </div>
+            <div id="progress">
+                    <p>Waiting for approval of the selective disclosure request</p>
+            </div>
+            <div id="cancel">
+                <button onClick="window.location.href='{{{referrer}}}'">Cancel</button>
+            </div>
+            <div id="promotion" class="modal-body text-center">
+                <p>If you do not have the app installed on your phone you can download it here.</p>
+                <a href="https://apps.apple.com/se/app/svipe-id/id1496637920"><img height=40 src="/Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg"></a>
+                <a href="https://play.google.com/store/apps/details?id=se.svipe"><img height=40 src="/google-play.png"></a>
+            </div>
+    
+        <a href="https://github.com/svipe/acme.svipe.io" class="github-corner" aria-label="View source on GitHub">
+            <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
+            <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+            <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+            <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+            </svg>
+        </a>
+        <iframe id="l" width="1" height="1" style="visibility:hidden"></iframe>
+</body>
+</html>
+
+<script type="text/javascript">
+
+var redirect_uri = "{{{redirect_uri}}}";
+var destination = "/welcome/";
+
+$(document).ready(function() {
+  setupSocket();
+  $("#signup").hide();
+   $("#meetsignin").hide();
+  $("#cancel").hide();
+  $("#progress").hide();
+});
+
+
+function showMeetQR() {
+    destination = "/meet/";
+    document.getElementById("l").src ="svipe:///auth/{{{jwsCompact}}}";
+    setTimeout(function() {
+        console.log(document.getElementById("l").src);
+        $("#signin").hide();
+        $("#meetsignin").show();
+        $("#cancel").show();
+        // Link to the App Store should go here -- only fires if deep link fails  
+        console.log("fail");              
+        //window.location = "https://itunes.apple.com/us/app/my.app/id123456789?ls=1&mt=8";
+    }, 500);
+    
+}
+
+
+function showQR() {
+    destination = "/welcome/";
+    document.getElementById("l").src ="svipe:///auth/{{{jwsCompact}}}";
+    setTimeout(function() {
+        console.log(document.getElementById("l").src);
+        $("#signin").hide();
+        $("#signup").show();
+        $("#cancel").show();
+        // Link to the App Store should go here -- only fires if deep link fails  
+        console.log("fail");              
+        //window.location = "https://itunes.apple.com/us/app/my.app/id123456789?ls=1&mt=8";
+    }, 500);
+    
+}
+
+function showProgress() {
+    $("#signup").hide();
+    $("#promotion").hide();
+    $("#cancel").show();
+    $("#progress").show();
+}
+
+function setupSocket() {
+
+    const socket = io('https://acme.svipe.io');
+    //const socket = io('http://localhost:4567');
+    if (socket == null ) {
+        console.error("Socket could not be opened");
+        return;
+    }
+    var helloMsg = {op: 'hello', uuid: '{{{sessionID}}}' };
+    socket.emit("message", helloMsg);
+    socket.on("message", function(msg) {
+        console.log("received ",msg);
+        if (msg.op == "hello") {
+            console.log("socket established");
+        } else if (msg.op == "progress") {
+            console.log("progress");
+            showProgress();
+        } else if (msg.op == "authdone") {
+            var jws = msg.jwt;
+            var sub = msg.sub;
+            if (jws != null) {
+                console.log("received jws token", jws);
+                socket.close();
+                // Now redirect 
+                window.location.href = destination+jws;
+            } else {
+                console.error("No jws token received");
+            }
+        } else {
+            console.error("Could not contact socket server")
+        }
+    });   
+}
+</script>

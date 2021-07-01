@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+    <html>
+      <head>
+        <script src='https://8x8.vc/external_api.js' async></script>
+        <style>html, body, #jaas-container { height: 100%; }</style>
+        <script type="text/javascript">
+          window.onload = () => {
+            const api = new JitsiMeetExternalAPI("8x8.vc", {
+              roomName: "vpaas-magic-cookie-b300fa8368094cbe9e17f8cb41adb915/SampleAppMutualCommentsSlapOut",
+              parentNode: document.querySelector('#jaas-container'),
+              jwt: "eyJraWQiOiJ2cGFhcy1tYWdpYy1jb29raWUtYjMwMGZhODM2ODA5NGNiZTllMTdmOGNiNDFhZGI5MTUvNjBmOWM3LVNBTVBMRV9BUFAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJqaXRzaSIsImV4cCI6MTYyNDYxOTIwMCwibmJmIjoxNjI0NjExOTk1LCJpc3MiOiJjaGF0Iiwicm9vbSI6IioiLCJzdWIiOiJ2cGFhcy1tYWdpYy1jb29raWUtYjMwMGZhODM2ODA5NGNiZTllMTdmOGNiNDFhZGI5MTUiLCJjb250ZXh0Ijp7ImZlYXR1cmVzIjp7ImxpdmVzdHJlYW1pbmciOmZhbHNlLCJvdXRib3VuZC1jYWxsIjpmYWxzZSwic2lwLW91dGJvdW5kLWNhbGwiOmZhbHNlLCJ0cmFuc2NyaXB0aW9uIjpmYWxzZSwicmVjb3JkaW5nIjpmYWxzZX0sInVzZXIiOnsibW9kZXJhdG9yIjp0cnVlLCJuYW1lIjoiVGVzdCBVc2VyIiwiaWQiOiJnb29nbGUtb2F1dGgyfDExMjI4NzMyNDMwMjE0MjcyODA0MyIsImF2YXRhciI6IiIsImVtYWlsIjoidGVzdC51c2VyQGNvbXBhbnkuY29tIn19fQ.VZmeoPYEhQLwfGBE9uOVPAeXBC2VkioEwS5HydNfem0DP-2fGQfCeZRDQufM0ojXOzJTevD5CrYAI-LTYvEC21Ap2qAov55JE-sIxzY1khRYd4MuF8eYLsVZaWoa0mQnrdG2FAE5I-CjcblhDpKjjTCfmRWncQALkMRO44tgeALiDYvc2YBCLSyF1aLTItd5D9_-feZKR1-txUNOmEuRAvBlU1CVPPjL0nx7jnmDfOkQAoigARwyCKWOlg3wtMXf2t8F2ixW8--iC01FhMAJw42M_s7jNfeyQCcrRM2AQ1l7110-SsOZw8jjyq8QbzzuO2NqMjAS7oyW_5kiK_bMeQ"
+            });
+          }
+        </script>
+      </head>
+      <body><div id="jaas-container" /></body>
+    </html>
